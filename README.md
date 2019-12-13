@@ -1,2 +1,2 @@
-# herds-of-buffalos
+# Herds of Buffalos
 Browser game
