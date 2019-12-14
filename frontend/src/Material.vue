@@ -1,9 +1,7 @@
 <template>
   <div id="materials">
     <md-list class="md-double-line">
-      <md-toolbar :md-elevation="1">
-        <span class="md-title">Surowce</span>
-      </md-toolbar>
+      <md-subheader>Surowce</md-subheader>
       <md-list-item layout="row">
 
         <div class="md-list-item-text">
