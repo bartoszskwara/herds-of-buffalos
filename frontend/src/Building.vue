@@ -6,7 +6,7 @@
     </md-toolbar>
       <md-list-item>
         <md-icon :md-src="require('./assets/bricks.svg')" />
-        <div class="md-list-item-text">
+        <div class="md-list-item-text level">
           <span>{{level}}</span>
           <span>Poziom</span>
         </div>
@@ -30,11 +30,7 @@
           <span>{{price.iron}}</span>
         </div>
       </md-list-item>
-      <md-list-item>
-        <div class="md-list-item-text">
-          <md-button class="md-raised md-primary">Rozbuduj</md-button>
-        </div>
-      </md-list-item>
+
   </div>
 </template>
 
@@ -43,12 +39,13 @@ export default {
   props: {
     name: String,
     level: Number,
+    maxLevel: Number,
     price: {
-      wood: Number,
-      clay: Number,
-      iron: Number,
-    },
-  }
+        wood: Number,
+        clay: Number,
+        iron: Number,
+        },
+  },
 }
 </script>
 
@@ -58,22 +55,24 @@ export default {
     max-width: 100%;
     display: inline-block;
     vertical-align: top;
-    border: 1px solid rgba(#000, .12);
+    border: 1px solid #e6e6e6;
+    padding-top: 0 !important;
   }
   .md-list-item-text {
     flex: auto;
   }
   .md-list-item-text span {
-    text-align: left;
+    text-align: center;
   }
   .md-icon {
     width: 0 !important;
     min-height: 110%;
-
   }
   .mat {
+    margin: auto !important;
     margin-bottom: 5px !important;
   }
-
-
+  .md-list-item-text.level {
+    margin-right: 60%;
+  }
 </style>

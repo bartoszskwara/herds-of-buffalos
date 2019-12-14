@@ -2,7 +2,17 @@
   <div id="buildings">
     <md-list class="md-double-line" :key="building" v-for="building in village">
       <building v-bind:name="building.name" v-bind:level="building.level" v-bind:price="building.price"></building>
+      <md-list-item>
+        <div class="md-list-item-text">
+          <md-button class="md-raised md-primary" @click="upgrade(building)">Rozbuduj</md-button>
+        </div>
+      </md-list-item>
     </md-list>
+
+    <md-dialog-alert
+      :md-active.sync="alertMaxLevel"
+      md-title="Dalsza rozbudowa niemożliwa!"
+      md-content="Ten budynek został już rozbudowany do najwyższego poziomu!" />
   </div>
 </template>
 
@@ -14,9 +24,19 @@ export default {
   props: {
     village: Array
   },
-  data(){
+  data() {
     return {
-
+      alertMaxLevel: false
+    }
+  },
+  methods: {
+    upgrade(building) {
+      if(building.level < building.maxLevel){
+        building.level++;
+      }
+      else {
+        this.alertMaxLevel = true;
+      }
     }
   }
 
