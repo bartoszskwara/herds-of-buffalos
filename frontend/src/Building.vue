@@ -1,0 +1,79 @@
+<template>
+  <div id="building">
+
+    <md-toolbar :md-elevation="1">
+      <span class="md-title">{{name}}</span>
+    </md-toolbar>
+      <md-list-item>
+        <md-icon :md-src="require('./assets/bricks.svg')" />
+        <div class="md-list-item-text">
+          <span>{{level}}</span>
+          <span>Poziom</span>
+        </div>
+      </md-list-item>
+
+      <md-list-item layout="row">
+        <md-icon :md-src="require('./assets/coins.svg')" />
+
+        <div class="md-list-item-text">
+          <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
+          <span>{{price.wood}}</span>
+        </div>
+
+        <div class="md-list-item-text">
+          <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
+          <span>{{price.clay}}</span>
+        </div>
+
+        <div class="md-list-item-text">
+          <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
+          <span>{{price.iron}}</span>
+        </div>
+      </md-list-item>
+      <md-list-item>
+        <div class="md-list-item-text">
+          <md-button class="md-raised md-primary">Rozbuduj</md-button>
+        </div>
+      </md-list-item>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    name: String,
+    level: Number,
+    price: {
+      wood: Number,
+      clay: Number,
+      iron: Number,
+    },
+  }
+}
+</script>
+
+<style>
+  .md-list {
+    width: 320px;
+    max-width: 100%;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid rgba(#000, .12);
+  }
+  .md-list-item-text {
+    flex: auto;
+  }
+  .md-list-item-text span {
+    text-align: left;
+  }
+  .md-icon {
+    width: 0 !important;
+    min-height: 110%;
+
+  }
+  .mat {
+    margin-bottom: 5px !important;
+  }
+
+
+</style>
