@@ -1,6 +1,6 @@
 <template>
   <div id="buildings">
-    <md-list class="md-double-line" :key="building" v-for="building in village">
+    <md-list class="md-double-line" :key="building" v-for="building in buildings">
       <building v-bind:name="building.name" v-bind:level="building.level" v-bind:price="building.price"></building>
       <md-list-item>
         <div class="md-list-item-text">
@@ -22,7 +22,7 @@ import Building from "./Building.vue";
 export default {
   components: {Building},
   props: {
-    village: Array
+    buildings: Array
   },
   data() {
     return {

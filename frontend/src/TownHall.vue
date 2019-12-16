@@ -1,5 +1,5 @@
 <template>
-  <div id="village">
+  <div id="townhall">
 
     <div class="rightPanel">
       <player-info :player="player"></player-info>
@@ -7,21 +7,20 @@
       <troops :troops="troops"></troops>
     </div>
     <div class="leftPanel">
-      <h1>Tu powinna być wiocha</h1>
-      <village-view :buildings="buildings"></village-view>
+      <building-list :buildings="buildings"></building-list>
     </div>
 
   </div>
 </template>
 
 <script>
-import VillageView from "./VillageView.vue";
+import BuildingList from "./BuildingList.vue";
 import Material from "./Material.vue";
 import PlayerInfo from "./PlayerInfo.vue";
 import Troops from "./Troops.vue";
 
 export default {
-  components: {VillageView, Material, PlayerInfo, Troops},
+  components: {BuildingList, Material, PlayerInfo, Troops},
   data() {
     return {
       buildings: [
@@ -33,8 +32,7 @@ export default {
             wood: 20000,
             clay: 3000,
             iron: 500,
-          },
-          link: "townhall",
+          }
         },
         {
           name: "Pastwisko bawołów",
@@ -44,8 +42,7 @@ export default {
             wood: 4,
             clay: 20,
             iron: 60,
-          },
-          link: "unnamed",
+          }
         },
         {
           name: "Koszary",
@@ -55,8 +52,7 @@ export default {
             wood: 460,
             clay: 200,
             iron: 600,
-          },
-          link: "unnamed",
+          }
         },
         {
           name: "Mur obronny",
@@ -66,8 +62,7 @@ export default {
             wood: 4,
             clay: 10,
             iron: 20,
-          },
-          link: "unnamed",
+          }
         },
       ],
       materials: {
