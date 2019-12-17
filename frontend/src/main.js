@@ -3,6 +3,7 @@ import Home from './Home.vue'
 import Scoreboard from './Scoreboard.vue'
 import Village from './Village.vue'
 import TownHall from './TownHall.vue'
+import Barracks from './Barracks.vue'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
@@ -18,6 +19,7 @@ const router = new VueRouter({
   routes: [
     { path: '/', component: Village },
     { path: '/townhall', component: TownHall },
+    { path: '/barracks', component: Barracks },
     { path: '/scoreboard', component: Scoreboard }
   ]
 })

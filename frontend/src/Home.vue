@@ -13,5 +13,12 @@ export default {
 </script>
 
 <style>
-
+ html {
+   overflow-y: scroll;
+ }
+ h1 {
+   font-family: Sui Generis;
+   font-size: 30pt;
+   text-align: center;
+ }
 </style>

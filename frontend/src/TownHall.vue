@@ -4,9 +4,10 @@
     <div class="rightPanel">
       <player-info :player="player"></player-info>
       <material :materials="materials"></material>
-      <troops :troops="troops"></troops>
+      <troops-panel :troops="troops"></troops-panel>
     </div>
     <div class="leftPanel">
+      <h1>Ratusz</h1>
       <building-list :buildings="buildings"></building-list>
     </div>
 
@@ -17,10 +18,10 @@
 import BuildingList from "./BuildingList.vue";
 import Material from "./Material.vue";
 import PlayerInfo from "./PlayerInfo.vue";
-import Troops from "./Troops.vue";
+import TroopsPanel from "./TroopsPanel.vue";
 
 export default {
-  components: {BuildingList, Material, PlayerInfo, Troops},
+  components: {BuildingList, Material, PlayerInfo, TroopsPanel},
   data() {
     return {
       buildings: [
@@ -104,7 +105,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .leftPanel {
   float: left;
   width: 76%;

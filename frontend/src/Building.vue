@@ -49,7 +49,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   .md-list {
     width: 320px;
     max-width: 100%;

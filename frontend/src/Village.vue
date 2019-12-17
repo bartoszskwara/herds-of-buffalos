@@ -4,24 +4,28 @@
     <div class="rightPanel">
       <player-info :player="player"></player-info>
       <material :materials="materials"></material>
-      <troops :troops="troops"></troops>
+      <troops-panel :troops="troops"></troops-panel>
     </div>
     <div class="leftPanel">
       <h1>Tu powinna być wiocha</h1>
-      <village-view :buildings="buildings"></village-view>
+
+      <md-button :key="building" v-for="building in buildings" class="md-dense md-raised md-primary" @click.native='setRoute(building.link)'>
+        {{building.name}}
+      </md-button>
+
     </div>
 
   </div>
 </template>
 
 <script>
-import VillageView from "./VillageView.vue";
+
 import Material from "./Material.vue";
 import PlayerInfo from "./PlayerInfo.vue";
-import Troops from "./Troops.vue";
+import TroopsPanel from "./TroopsPanel.vue";
 
 export default {
-  components: {VillageView, Material, PlayerInfo, Troops},
+  components: {Material, PlayerInfo, TroopsPanel},
   data() {
     return {
       buildings: [
@@ -56,7 +60,7 @@ export default {
             clay: 200,
             iron: 600,
           },
-          link: "unnamed",
+          link: "barracks",
         },
         {
           name: "Mur obronny",
@@ -104,6 +108,11 @@ export default {
           count: 0,
         },
       ],
+    }
+  },
+  methods: {
+    setRoute(link){
+      this.$router.push(link);
     }
   }
 }
