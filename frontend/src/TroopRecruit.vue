@@ -18,45 +18,41 @@
         <span class="text">{{troop.count}}</span>
         <span class="textLabel">Ilość</span>
       </div>
-      <div class="md-list-item-text">
-        <span class="text">{{troop.attr.attack}}</span>
+      <div class="md-list-item-text divider surowce">
+
         <span><md-icon class="mat" :md-src="require('./assets/attack.svg')" /></span>
+        <span class="textLabel">{{troop.attr.attack}}</span>
       </div>
-      <div class="md-list-item-text">
-        <span class="text">{{troop.attr.defense}}</span>
+      <div class="md-list-item-text surowce">
+
         <span><md-icon class="mat" :md-src="require('./assets/defense.svg')" /></span>
+        <span class="textLabel">{{troop.attr.defense}}</span>
       </div>
-    </md-list-item>
-    <md-divider></md-divider>
-    <md-list-item layout="row" class="surowce">
-      <md-icon :md-src="require('./assets/coins.svg')" />
 
-      <div class="md-list-item-text">
+
+
+      <div class="md-list-item-text divider surowce">
         <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
-        <span>{{troop.price.wood}}</span>
+        <span class="textLabel">{{troop.price.wood}}</span>
       </div>
 
-      <div class="md-list-item-text">
+      <div class="md-list-item-text surowce">
         <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
-        <span>{{troop.price.clay}}</span>
+        <span class="textLabel">{{troop.price.clay}}</span>
       </div>
 
-      <div class="md-list-item-text">
+      <div class="md-list-item-text surowce">
         <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
-        <span>{{troop.price.iron}}</span>
+        <span class="textLabel">{{troop.price.iron}}</span>
       </div>
-    </md-list-item>
-    <md-divider></md-divider>
-    <md-list-item>
-      <md-icon :md-src="require('./assets/recruitment.svg')" />
-      <div class="md-list-item-text">
+
+      <div class="md-list-item-text recruit">
         <md-field>
           <label>Rekrutacja</label>
           <md-input v-model="recruitCount" @keypress="isNumber($event)"></md-input>
         </md-field>
       </div>
-    </md-list-item>
-    <md-list-item>
+
       <div class="md-list-item-text">
         <md-button class="md-raised md-primary" @click="recruit()" :disabled="recruitCount > 0 ? false : true">Rekrutuj</md-button>
       </div>
@@ -64,7 +60,7 @@
 
 
     <md-snackbar md-position="center" md-duration="3000" :md-active.sync="showSnackbar" md-persistent>
-      <span>Rozpoczęto rekrutację {{recruitCount}} jednostek typu {{troop.name}}.</span>
+      <span>Rozpoczęto rekrutację {{snackbarRecruitCount}} jednostek typu {{troop.name}}.</span>
     </md-snackbar>
   </div>
 </template>
@@ -74,6 +70,7 @@ export default {
   data() {
     return {
       recruitCount: null,
+      snackbarRecruitCount: 0,
       showSnackbar: false,
     }
   },
@@ -95,6 +92,7 @@ export default {
     },
     recruit() {
       this.showSnackbar = true;
+      this.snackbarRecruitCount = this.recruitCount;
       this.recruitCount = null;
     }
   }
@@ -105,8 +103,11 @@ export default {
 .md-list-item-text span {
   text-align: center;
   min-height: 30px;
-
+  /* border: 1px solid red; */
   height: 40px;
+}
+.divider {
+  border-left: 1px solid grey;
 }
 .text {
   padding-top: 20px;
@@ -127,7 +128,15 @@ export default {
   margin-top: 15px;
   width: auto !important;
 }
-.md-list-item.surowce span {
-  height: inherit;
+.md-list-item-text {
+  flex-grow: 5 !important;
+}
+.md-list-item-text.surowce {
+  flex-grow: 3 !important;
+}
+.md-list-item-text.recruit {
+  flex-grow: 6 !important;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 </style>

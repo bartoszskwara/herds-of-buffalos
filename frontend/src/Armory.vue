@@ -1,18 +1,18 @@
 <template>
   <div id="barracks">
-      <h1>Koszary</h1>
+      <h1>Zbrojownia</h1>
     <md-list class="md-double-line troop" :key="troop" v-for="troop in troopsArray">
-      <troop-recruit v-bind:troop="troop"></troop-recruit>
+      <troop-armory v-bind:troop="troop"></troop-armory>
     </md-list>
   </div>
 </template>
 
 <script>
-import TroopRecruit from "./TroopRecruit.vue";
+import TroopArmory from "./TroopArmory.vue";
 import troopsArray from "./assets/troops.js";
 
 export default {
-  components: {TroopRecruit},
+  components: {TroopArmory},
   data() {
     return {
       alertMaxLevel: false,
@@ -32,7 +32,7 @@ h1 {
   text-align: center;
 }
   .md-list.troop {
-    width: 95% !important;
+    width: 540px !important;
     max-width: 100%;
     display: inline-block;
     vertical-align: top;

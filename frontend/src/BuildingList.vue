@@ -1,7 +1,7 @@
 <template>
   <div id="buildings">
     <md-list class="md-double-line" :key="building" v-for="building in buildings">
-      <building v-bind:name="building.name" v-bind:level="building.level" v-bind:price="building.price"></building>
+      <building v-bind:building="building"></building>
       <md-list-item>
         <div class="md-list-item-text">
           <md-button class="md-raised md-primary" @click="upgrade(building)">Rozbuduj</md-button>
