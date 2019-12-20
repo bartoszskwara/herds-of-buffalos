@@ -1,8 +1,9 @@
 backend/HELP.md
-backend/target/
+backend/**/target/
 !backend/.mvn/wrapper/maven-wrapper.jar
 !backend/**/src/main/**
 !backend/**/src/test/**
+backend/db/**
 
 ### IntelliJ IDEA ###
 .idea
