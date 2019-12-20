@@ -55,7 +55,7 @@
 
 
     <md-snackbar md-position="center" md-duration="3000" :md-active.sync="showSnackbar" md-persistent>
-      <span>Rozpoczęto szkolenie jednostek typu {{troop.name}}.</span>
+      <span>{{snackbarText}}</span>
     </md-snackbar>
   </div>
 </template>
@@ -65,6 +65,7 @@ export default {
   data() {
     return {
       showSnackbar: false,
+      snackbarText: String,
     }
   },
   props: {
@@ -75,6 +76,13 @@ export default {
       return this.troop.level/this.troop.maxLevel*100;
     },
     rankup() {
+      if(this.troop.level < this.troop.maxLevel){
+        this.snackbarText = "Rozpoczęto szkolenie jednostek typu "+this.troop.name+".";
+        this.troop.level++;
+      }
+      else {
+        this.snackbarText = "Osiągnięto już maksymalne wyszkolenie jednostek typu "+this.troop.name+".";
+      }
       this.showSnackbar = true;
     }
   }

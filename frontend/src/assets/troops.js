@@ -2,7 +2,7 @@ const troopsArray = [
     {
       name: "Pikinier",
       level: 1,
-      maxLevel: 5,
+      maxLevel: 10,
       count: 400,
       price: {
         wood: 7,

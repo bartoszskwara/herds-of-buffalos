@@ -50,6 +50,7 @@ export default {
 <style scoped>
 .md-toolbar:hover {
   background-color: #ebebeb;
+  cursor: pointer;
 }
   .md-list {
     width: 320px;

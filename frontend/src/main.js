@@ -5,6 +5,7 @@ import Village from './Village.vue'
 import TownHall from './TownHall.vue'
 import Barracks from './Barracks.vue'
 import Armory from './Armory.vue'
+import Map from './Map.vue'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
@@ -22,6 +23,7 @@ const router = new VueRouter({
     { path: '/townhall', component: TownHall },
     { path: '/barracks', component: Barracks },
     { path: '/armory', component: Armory },
+    { path: '/map', component: Map },
     { path: '/scoreboard', component: Scoreboard }
   ]
 })

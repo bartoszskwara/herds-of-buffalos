@@ -6,7 +6,6 @@
         {{building.name}}
       </md-button>
 
-
   </div>
 </template>
 
@@ -30,28 +29,6 @@ export default {
         villageCount: 1,
         activeVillage: "Miasto Bawol"
       },
-      troops: [
-        {
-          name: "Pikinier",
-          count: 400,
-        },
-        {
-          name: "Miecznik",
-          count: 200,
-        },
-        {
-          name: "Konny Bawół",
-          count: 50,
-        },
-        {
-          name: "Bawół na smoku",
-          count: 15,
-        },
-        {
-          name: "Działko plazmowe",
-          count: 0,
-        },
-      ],
     }
   },
   methods: {
