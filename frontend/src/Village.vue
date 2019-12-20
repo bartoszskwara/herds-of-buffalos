@@ -1,75 +1,22 @@
 <template>
   <div id="village">
-
-    <div class="rightPanel">
-      <player-info :player="player"></player-info>
-      <material :materials="materials"></material>
-      <troops :troops="troops"></troops>
-    </div>
-    <div class="leftPanel">
       <h1>Tu powinna być wiocha</h1>
-      <village-view :buildings="buildings"></village-view>
-    </div>
+
+      <md-button :key="building" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.link)'>
+        {{building.name}}
+      </md-button>
 
   </div>
 </template>
 
 <script>
-import VillageView from "./VillageView.vue";
-import Material from "./Material.vue";
-import PlayerInfo from "./PlayerInfo.vue";
-import Troops from "./Troops.vue";
+
+import buildingsArray from "./assets/buildings.js";
 
 export default {
-  components: {VillageView, Material, PlayerInfo, Troops},
   data() {
     return {
-      buildings: [
-        {
-          name: "Ratusz",
-          level: 4,
-          maxLevel: 20,
-          price: {
-            wood: 20000,
-            clay: 3000,
-            iron: 500,
-          },
-          link: "townhall",
-        },
-        {
-          name: "Pastwisko bawołów",
-          level: 1,
-          maxLevel: 6,
-          price: {
-            wood: 4,
-            clay: 20,
-            iron: 60,
-          },
-          link: "unnamed",
-        },
-        {
-          name: "Koszary",
-          level: 1,
-          maxLevel: 15,
-          price: {
-            wood: 460,
-            clay: 200,
-            iron: 600,
-          },
-          link: "unnamed",
-        },
-        {
-          name: "Mur obronny",
-          level: 1,
-          maxLevel: 10,
-          price: {
-            wood: 4,
-            clay: 10,
-            iron: 20,
-          },
-          link: "unnamed",
-        },
-      ],
+      buildingsArray: buildingsArray,
       materials: {
         wood: 3298,
         clay: 1290,
@@ -82,28 +29,11 @@ export default {
         villageCount: 1,
         activeVillage: "Miasto Bawol"
       },
-      troops: [
-        {
-          name: "Pikinier",
-          count: 400,
-        },
-        {
-          name: "Miecznik",
-          count: 200,
-        },
-        {
-          name: "Konny Bawół",
-          count: 50,
-        },
-        {
-          name: "Bawół na smoku",
-          count: 15,
-        },
-        {
-          name: "Działko plazmowe",
-          count: 0,
-        },
-      ],
+    }
+  },
+  methods: {
+    setRoute(link){
+      this.$router.push(link);
     }
   }
 }

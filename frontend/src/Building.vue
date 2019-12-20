@@ -1,13 +1,13 @@
 <template>
   <div id="building">
 
-    <md-toolbar :md-elevation="1">
-      <span class="md-title">{{name}}</span>
+    <md-toolbar :md-elevation="1" @click.native='setRoute(building.link)'>
+      <span class="md-title">{{building.name}}</span>
     </md-toolbar>
       <md-list-item>
         <md-icon :md-src="require('./assets/bricks.svg')" />
         <div class="md-list-item-text level">
-          <span>{{level}}</span>
+          <span>{{building.level}}</span>
           <span>Poziom</span>
         </div>
       </md-list-item>
@@ -17,17 +17,17 @@
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
-          <span>{{price.wood}}</span>
+          <span>{{building.price.wood}}</span>
         </div>
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
-          <span>{{price.clay}}</span>
+          <span>{{building.price.clay}}</span>
         </div>
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
-          <span>{{price.iron}}</span>
+          <span>{{building.price.iron}}</span>
         </div>
       </md-list-item>
 
@@ -37,19 +37,21 @@
 <script>
 export default {
   props: {
-    name: String,
-    level: Number,
-    maxLevel: Number,
-    price: {
-        wood: Number,
-        clay: Number,
-        iron: Number,
-        },
+    building: Object,
   },
+  methods: {
+    setRoute(link){
+      this.$router.push(link);
+    }
+  }
 }
 </script>
 
-<style>
+<style scoped>
+.md-toolbar:hover {
+  background-color: #ebebeb;
+  cursor: pointer;
+}
   .md-list {
     width: 320px;
     max-width: 100%;

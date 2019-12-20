@@ -39,7 +39,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.md-list-item-text span {
+  text-align: center !important;
+}
 .nick {
   padding-right: 35%;
 }

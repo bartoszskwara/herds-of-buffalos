@@ -32,6 +32,16 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.md-icon {
+  width: 0 !important;
+  min-height: 110%;
+}
+.mat {
+  margin: auto !important;
+  margin-bottom: 5px !important;
+}
+.md-list-item-text span {
+  text-align: center !important;
+}
 </style>
