@@ -51,15 +51,37 @@ export default {
 
 <style>
 .mapView {
-  width: 1125px;
+  width: 900px;
+  min-width: 900px;
   margin: auto;
   height: 560px;
   outline: 1px solid black;
-  background-color: #a5e8aa;
   position: relative;
+  background:
+        linear-gradient(-90deg, rgba(0,0,0,.05) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
+        linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+        linear-gradient(transparent 3px, #a5e8aa 3px, #a5e8aa 38px, transparent 38px),
+        linear-gradient(-90deg, #aaa 1px, transparent 1px),
+        linear-gradient(-90deg, transparent 3px, #a5e8aa 3px, #a5e8aa 43px, transparent 43px),
+        linear-gradient(#aaa 1px, transparent 1px),
+        #a5e8aa;
+    background-size:
+        22.5px 20px,
+        22.5px 20px,
+        45px 40px,
+        45px 40px,
+        45px 40px,
+        45px 40px,
+        45px 40px,
+        45px 40px;
+
 }
 .wioska {
   position: absolute;
+  width: 45px;
+  text-align: center;
 }
 .md-tooltip {
     height: auto !important;

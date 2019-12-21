@@ -46,6 +46,7 @@ export default {
 <style>
   .md-list {
     width: 320px;
+    min-width: 320px;
     max-width: 100%;
     display: inline-block;
     vertical-align: top;

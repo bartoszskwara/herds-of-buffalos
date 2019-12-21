@@ -1,13 +1,15 @@
 <template>
   <div id="app">
     <navigation-bar></navigation-bar>
+    <div class="leftPanel">
+
+      <router-view></router-view>
+
+    </div>
     <div class="rightPanel">
       <player-info :player="player"></player-info>
       <material-panel :materials="materials"></material-panel>
       <troops-panel :troops="troopsArray"></troops-panel>
-    </div>
-    <div class="leftPanel">
-      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -49,5 +51,17 @@ h1 {
   font-family: Sui Generis;
   font-size: 30pt;
   text-align: center;
+}
+.leftPanel {
+  float: left;
+}
+
+
+.rightPanel {
+  float: right;
+  width: 24%;
+  min-width: 320px;
+  border-left: 1px solid grey;
+  padding-right: 20px;
 }
 </style>

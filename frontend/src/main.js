@@ -10,8 +10,10 @@ import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 import VueRouter from 'vue-router'
+import VueResource from 'vue-resource'
 
 Vue.use(VueRouter)
+Vue.use(VueResource)
 
 Vue.use(VueMaterial)
 

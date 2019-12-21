@@ -22,14 +22,4 @@ export default {
 </script>
 
 <style scoped>
-.leftPanel {
-  float: left;
-  width: 76%;
-}
-.rightPanel {
-  float: right;
-  width: 24%;
-  border-left: 1px solid grey;
-  padding-right: 20px;
-}
 </style>

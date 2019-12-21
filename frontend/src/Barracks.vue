@@ -33,6 +33,7 @@ h1 {
 }
   .md-list.troop {
     width: 95% !important;
+    min-width: 720px;
     max-width: 100%;
     display: inline-block;
     vertical-align: top;
