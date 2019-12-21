@@ -3,8 +3,8 @@
       <h1>Tu powinna być wiocha</h1>
 
 
-      <md-button :key="building" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.link)'>
-        {{building.building.name}}
+      <md-button :key="building" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)'>
+        {{building.building.label}}
       </md-button>
 
 
@@ -37,8 +37,7 @@ export default {
   },
   created: function(){
     this.$http.get("http://localhost:8088/user/"+this.playerID+"/building").then(function(data) {
-      //console.log(data);
-      this.buildingsArray = data.body.buildings;
+      this.buildingsArray = data.body.content;
     })
   },
   methods: {

@@ -1,6 +1,7 @@
 package com.buffalosoftware.rest;
 
 import com.buffalosoftware.city.IBuildingService;
+import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.dto.building.BuildingDto;
 import com.buffalosoftware.dto.building.UserBuildingDto;
 import com.buffalosoftware.dto.building.UserDto;
@@ -27,20 +28,6 @@ public class UserBuildingController {
 
     @GetMapping("")
     public ResponseEntity getAllUserBuildings(@NotNull @PathVariable("userId") Long userId) {
-        User user = buildingService.getUserWithBuildings(userId).orElseThrow(() -> new IllegalArgumentException("User doesn't exists!"));
-        UserDto userDto = UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .buildings(user.getUserBuildings().stream()
-                        .map(ub -> UserBuildingDto.builder()
-                                .building(BuildingDto.builder()
-                                        .id(ub.getBuilding().getId())
-                                        .name(ub.getBuilding().getName())
-                                        .build())
-                                .level(ub.getLevel()).build())
-                        .collect(toList()))
-                .build();
-
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(new BaseDtoList<>(buildingService.getUserBuildings(userId)));
     }
 }

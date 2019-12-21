@@ -3,7 +3,7 @@ package com.buffalosoftware.rest;
 import com.buffalosoftware.city.IBuildingService;
 import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.dto.building.BuildingDto;
-import com.buffalosoftware.entity.Building;
+import com.buffalosoftware.entity.BuildingKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +22,11 @@ public class BuildingController {
 
     @GetMapping("")
     public ResponseEntity getAllAvailableBuildings() {
-        List<Building> buildings = buildingService.getAllAvailableBuildings();
+        List<BuildingKey> buildings = buildingService.getAllAvailableBuildings();
         List<BuildingDto> buildingDtos = buildings.stream()
                 .map(b -> BuildingDto.builder()
-                        .id(b.getId())
-                        .name(b.getName())
+                        .key(b)
+                        .label(b.getName())
                         .maxLevel(b.getMaxLevel())
                         .build())
                 .collect(Collectors.toList());

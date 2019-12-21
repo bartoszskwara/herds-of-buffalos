@@ -1,12 +1,13 @@
 package com.buffalosoftware.dto.building;
 
+import com.buffalosoftware.entity.BuildingKey;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class BuildingDto extends BaseDto {
-    private Long id;
-    private String name;
+    private BuildingKey key;
+    private String label;
     private Integer maxLevel;
 }

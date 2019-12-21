@@ -4,6 +4,7 @@ backend/**/target/
 !backend/**/src/main/**
 !backend/**/src/test/**
 backend/app/db/**
+backend/db/**
 
 ### IntelliJ IDEA ###
 .idea
