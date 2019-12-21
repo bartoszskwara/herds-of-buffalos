@@ -3,7 +3,7 @@ backend/**/target/
 !backend/.mvn/wrapper/maven-wrapper.jar
 !backend/**/src/main/**
 !backend/**/src/test/**
-backend/db/**
+backend/app/db/**
 
 ### IntelliJ IDEA ###
 .idea
