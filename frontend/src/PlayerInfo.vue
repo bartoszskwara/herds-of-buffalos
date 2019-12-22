@@ -48,6 +48,9 @@ export default {
 </script>
 
 <style scoped>
+.md-list {
+  margin-left: 0 !important;
+}
 .md-list-item-text span {
   text-align: center !important;
 }

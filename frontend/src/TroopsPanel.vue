@@ -3,7 +3,7 @@
     <md-list class="md-double-line md-dense">
       <md-subheader>Jednostki</md-subheader>
 
-      <md-list-item :key="troop" v-for="troop in nonzeroTroops">
+      <md-list-item :key="troop.name" v-for="troop in nonzeroTroops">
 
         <md-icon>face</md-icon>
         <div class="md-list-item-text">
@@ -40,6 +40,9 @@ export default {
 </script>
 
 <style scoped>
+.md-list {
+  margin-left: 0 !important;
+}
 .md-list-item-text span {
   text-align: center !important;
 }

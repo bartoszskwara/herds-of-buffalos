@@ -1,32 +1,139 @@
 <template>
   <div id="map">
       <h1>Mapa</h1>
-      <map-view></map-view>
+      <div class="mapView">
+        <div class="wioska" v-bind:key="village.name" v-for="village in mapVillages"
+           v-bind:style="stylePositionVillage(village)" @click="villageClicked(village)">
+           <img :src="setVillageImage(village)" />
+           <md-tooltip md-direction="top"><b>Gracz:</b>  {{village.player}}
+             <br><b>Wioska:</b>  {{village.name}}
+             <br><b>Punkty:</b>  {{village.points}}</md-tooltip>
+         </div>
+      </div>
+
+      <md-dialog :md-active.sync="villageDialog">
+        <md-dialog-title class="dialogHeader">
+          <h1 class="headerTitle">{{chosenVillage.name}}</h1>
+          <span class="smallText">{{chosenVillage.points}} punktów</span>
+          <span class="playerText">Gracz: {{chosenVillage.player}}</span>
+        </md-dialog-title>
+
+        <div>
+          <md-button class="md-raised md-accent">Wyślij wojska</md-button>
+          <md-button class="md-raised md-primary">Profil gracza</md-button>
+        </div>
+      </md-dialog>
+
   </div>
 </template>
 
 <script>
 import mapVillages from "./assets/mapVillages.js";
-import MapView from "./MapView.vue";
 
 export default {
-  components: {MapView},
   data() {
     return {
       mapVillages: mapVillages,
-      squareSize: 40,
-      obj: String,
+      squareSizeX: 45,
+      squareSizeY: 40,
+      imagePath: String,
+      villageDialog: false,
+      chosenVillage: Object,
     }
   },
   methods: {
     stylePositionVillage(village) {
-      this.obj =  {top: this.squareSize*village.y+'px', left: this.squareSize*village.x+'px'};
-      return this.obj;
+      var positionStyle = {top: this.squareSizeY*village.y+'px', left: this.squareSizeX*village.x+'px'};
+      return positionStyle;
+    },
+    setVillageImage(village){
+      var image = require.context('./assets/', false, /\.png$/)
+      if(village.points < 300){
+        return image('./wioska1.png')
+      }
+      else if(village.points >= 300 && village.points < 1000){
+        return image('./wioska2.png')
+      }
+      else if(village.points >= 1000 && village.points < 3000){
+        return image('./wioska3.png')
+      }
+      else if(village.points >= 3000){
+        return image('./wioska4.png')
+      }
+    },
+    villageClicked(village){
+      this.chosenVillage = village;
+      this.villageDialog = true;
     }
   }
 }
 </script>
 
 <style>
+#map {
+  margin: 0px 40px 0px 40px;
+}
+.mapView {
+  width: 900px;
+  min-width: 900px;
+  margin: auto;
+  height: 560px;
+  outline: 1px solid black;
+  position: relative;
+  background:
+        linear-gradient(-90deg, rgba(0,0,0,.05) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
+        linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+        linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+        linear-gradient(transparent 3px, #a5e8aa 3px, #a5e8aa 38px, transparent 38px),
+        linear-gradient(-90deg, #aaa 1px, transparent 1px),
+        linear-gradient(-90deg, transparent 3px, #a5e8aa 3px, #a5e8aa 43px, transparent 43px),
+        linear-gradient(#aaa 1px, transparent 1px),
+        #a5e8aa;
+    background-size:
+        22.5px 20px,
+        22.5px 20px,
+        45px 40px,
+        45px 40px,
+        45px 40px,
+        45px 40px,
+        45px 40px,
+        45px 40px;
 
+}
+.wioska {
+  position: absolute;
+  width: 45px;
+  text-align: center;
+  cursor: pointer;
+}
+.md-tooltip {
+    height: auto !important;
+}
+.md-dialog {
+  padding: 0px 20px 20px 20px;
+}
+.dialogHeader {
+    border-bottom: 1px solid grey;
+    text-align: center;
+    padding-bottom: 20px !important;
+}
+.headerTitle {
+  font-size: 17pt;
+  margin: 0;
+}
+.smallText {
+  font-size: 8pt;
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+.playerText {
+  font-size: 12pt;
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
 </style>

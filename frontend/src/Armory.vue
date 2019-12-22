@@ -1,7 +1,7 @@
 <template>
   <div id="barracks">
       <h1>Zbrojownia</h1>
-    <md-list class="md-double-line troop" :key="troop" v-for="troop in troopsArray">
+    <md-list class="md-double-line troop" :key="troop.name" v-for="troop in troopsArray">
       <troop-armory v-bind:troop="troop"></troop-armory>
     </md-list>
   </div>

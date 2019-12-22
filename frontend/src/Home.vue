@@ -1,15 +1,17 @@
 <template>
   <div id="app">
+
     <navigation-bar></navigation-bar>
-    <div class="leftPanel">
+    <div class="container">
+      <div class="leftPanel">
+        <router-view></router-view>
+      </div>
 
-      <router-view></router-view>
-
-    </div>
-    <div class="rightPanel">
-      <player-info :player="player"></player-info>
-      <material-panel :materials="materials"></material-panel>
-      <troops-panel :troops="troopsArray"></troops-panel>
+      <div class="rightPanel">
+        <player-info :player="player"></player-info>
+        <material-panel :materials="materials"></material-panel>
+        <troops-panel :troops="troopsArray"></troops-panel>
+      </div>
     </div>
   </div>
 </template>
@@ -46,22 +48,27 @@ export default {
 <style>
 html {
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 h1 {
   font-family: Sui Generis;
   font-size: 30pt;
   text-align: center;
 }
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .leftPanel {
-  float: left;
+  flex: 1;
 }
 
 
 .rightPanel {
-  float: right;
-  width: 24%;
-  min-width: 320px;
+
+  padding-left: 20px;
+  min-width: 340px;
   border-left: 1px solid grey;
-  padding-right: 20px;
 }
 </style>

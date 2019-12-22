@@ -33,6 +33,9 @@ export default {
 </script>
 
 <style scoped>
+.md-list {
+  margin-left: 0 !important;
+}
 .md-icon {
   width: 0 !important;
   min-height: 110%;

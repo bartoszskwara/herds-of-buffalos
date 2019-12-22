@@ -1,6 +1,6 @@
 <template>
   <div id="scoreboard">
-    <md-table v-model="users" md-sort="name" md-sort-order="asc" md-card>
+    <md-table v-model="users" md-sort="score" md-card>
       <md-table-toolbar>
         <h1 class="md-title">Ranking graczy</h1>
       </md-table-toolbar>
@@ -51,6 +51,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.md-table {
+  min-width: 800px !important;
+}
 </style>
