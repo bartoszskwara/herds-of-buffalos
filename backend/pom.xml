@@ -15,6 +15,7 @@
         <module>city</module>
         <module>api</module>
         <module>domain</module>
+        <module>user</module>
     </modules>
 
     <properties>
@@ -87,6 +88,11 @@
             <dependency>
                 <groupId>com.buffalosoftware</groupId>
                 <artifactId>domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.buffalosoftware</groupId>
+                <artifactId>user</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

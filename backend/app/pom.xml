@@ -48,6 +48,10 @@
             <artifactId>city</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.buffalosoftware</groupId>
+            <artifactId>user</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
