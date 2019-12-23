@@ -59,7 +59,7 @@
     </md-list-item>
 
 
-    <md-snackbar md-position="center" md-duration="3000" :md-active.sync="showSnackbar" md-persistent>
+    <md-snackbar md-position="center" :md-duration="snackbarDuration" :md-active.sync="showSnackbar" md-persistent>
       <span>Rozpoczęto rekrutację {{snackbarRecruitCount}} jednostek typu {{troop.name}}.</span>
     </md-snackbar>
   </div>
@@ -72,6 +72,7 @@ export default {
       recruitCount: null,
       snackbarRecruitCount: 0,
       showSnackbar: false,
+      snackbarDuration: 3000,
     }
   },
   props: {

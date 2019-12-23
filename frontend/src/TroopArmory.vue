@@ -54,7 +54,7 @@
     </md-list-item>
 
 
-    <md-snackbar md-position="center" md-duration="3000" :md-active.sync="showSnackbar" md-persistent>
+    <md-snackbar md-position="center" :md-duration="snackbarDuration" :md-active.sync="showSnackbar" md-persistent>
       <span>{{snackbarText}}</span>
     </md-snackbar>
   </div>
@@ -66,6 +66,7 @@ export default {
     return {
       showSnackbar: false,
       snackbarText: String,
+      snackbarDuration: 3000,
     }
   },
   props: {

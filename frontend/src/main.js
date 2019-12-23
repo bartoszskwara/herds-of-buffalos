@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Home from './Home.vue'
 import Scoreboard from './Scoreboard.vue'
+import Reports from './Reports.vue'
 import Village from './Village.vue'
 import TownHall from './TownHall.vue'
 import Barracks from './Barracks.vue'
@@ -26,7 +27,8 @@ const router = new VueRouter({
     { path: '/barracks', component: Barracks },
     { path: '/armory', component: Armory },
     { path: '/map', component: Map },
-    { path: '/scoreboard', component: Scoreboard }
+    { path: '/scoreboard', component: Scoreboard },
+    { path: '/reports', component: Reports }
   ]
 })
 

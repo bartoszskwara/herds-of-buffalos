@@ -1,6 +1,6 @@
 <template>
   <div id="buildings">
-    <md-list class="md-double-line" :key="building" v-for="building in buildings">
+    <md-list class="md-double-line" :key="building.name" v-for="building in buildings">
       <building v-bind:building="building"></building>
       <md-list-item>
         <div class="md-list-item-text">
