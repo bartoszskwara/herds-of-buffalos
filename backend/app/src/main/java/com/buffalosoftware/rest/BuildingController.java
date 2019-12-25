@@ -1,6 +1,6 @@
 package com.buffalosoftware.rest;
 
-import com.buffalosoftware.city.IBuildingService;
+import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.dto.building.BuildingDto;
 import com.buffalosoftware.entity.BuildingKey;

@@ -10,4 +10,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u join fetch u.userBuildings where u.id = :userId")
     Optional<User> findUserWithBuildingsById(@Param("userId") Long userId);
+
+    @Query(value = "select u.rank from (select row_number() over (order by points desc) as rank, id FROM USER) u where u.id = :userId",
+            nativeQuery = true)
+    Long findRankByPoints(@Param("userId") Long userId);
 }

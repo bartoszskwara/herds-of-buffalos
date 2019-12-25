@@ -1,14 +1,12 @@
 <template>
   <div id="village">
-      <h1>{{player.activeVillage}}</h1>
-      <div class="villageView">
-        <router-link class="buildingImg" v-bind:style="setVillagePosition(400,70)" to="townhall"><img src="./assets/townhall.png"/></router-link>
-        <router-link class="buildingImg" v-bind:style="setVillagePosition(600,250)" to="armory"><img src="./assets/armory.jpg"/></router-link>
-      </div>
+      <h1>Tu powinna być wiocha</h1>
 
-      <md-button :key="building.name" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)'>
+
+      <md-button :key="building" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)'>
         {{building.building.label}}
       </md-button>
+
 
   </div>
 </template>
@@ -22,7 +20,7 @@ export default {
     return {
       //buildingsArray: buildingsArray,
       buildingsArray: [],
-      playerID: 105,
+      playerID: 1,
       materials: {
         wood: 3298,
         clay: 1290,
@@ -45,27 +43,20 @@ export default {
   methods: {
     setRoute(link){
       this.$router.push(link);
-    },
-    setVillagePosition(x, y){
-      var positionStyle = {top: y+'px', left: x+'px'};
-      return positionStyle;
     }
   }
 }
 </script>
 
 <style>
-.villageView {
-  width: 900px;
-  min-width: 900px;
-  margin: auto;
-  height: 600px;
-  outline: 1px solid grey;
-  position: relative;
+.leftPanel {
+  float: left;
+  width: 76%;
 }
-.buildingImg {
-  width: 200px;
-  position: absolute;
-
+.rightPanel {
+  float: right;
+  width: 24%;
+  border-left: 1px solid grey;
+  padding-right: 20px;
 }
 </style>

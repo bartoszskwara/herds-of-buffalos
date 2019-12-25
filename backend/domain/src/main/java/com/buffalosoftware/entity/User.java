@@ -17,6 +17,9 @@ public class User extends BaseEntity {
     @Column(nullable = false, name = "email")
     private String email;
 
+    @Column(nullable = false, name = "points")
+    private Long points;
+
     @OneToMany(mappedBy = "user")
     private Set<UserBuilding> userBuildings = new HashSet<>();
 
@@ -42,6 +45,14 @@ public class User extends BaseEntity {
 
     public void setUserBuildings(Set<UserBuilding> userBuildings) {
         this.userBuildings = userBuildings;
+    }
+
+    public Long getPoints() {
+        return points;
+    }
+
+    public void setPoints(Long points) {
+        this.points = points;
     }
 }
 
