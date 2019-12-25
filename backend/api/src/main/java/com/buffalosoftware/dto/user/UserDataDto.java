@@ -15,4 +15,13 @@ public class UserDataDto extends BaseDto {
     private Long points;
     private Integer numberOfCities;
     private Long ranking;
+    private Resources resources;
+
+    @Getter
+    @Builder
+    public static class Resources {
+        private Long wood;
+        private Long clay;
+        private Long iron;
+    }
 }

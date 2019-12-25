@@ -3,6 +3,7 @@ package com.buffalosoftware.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private Set<UserBuilding> userBuildings = new HashSet<>();
+
+    @OneToOne(mappedBy = "user")
+    private UserResources userResources;
 
     public String getName() {
         return name;
@@ -53,6 +57,14 @@ public class User extends BaseEntity {
 
     public void setPoints(Long points) {
         this.points = points;
+    }
+
+    public UserResources getUserResources() {
+        return userResources;
+    }
+
+    public void setUserResources(UserResources userResources) {
+        this.userResources = userResources;
     }
 }
 
