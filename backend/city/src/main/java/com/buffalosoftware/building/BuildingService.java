@@ -1,6 +1,6 @@
 package com.buffalosoftware.building;
 
-import com.buffalosoftware.city.IBuildingService;
+import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.dto.building.BuildingDto;
 import com.buffalosoftware.dto.building.UserBuildingDto;
 import com.buffalosoftware.entity.BuildingKey;

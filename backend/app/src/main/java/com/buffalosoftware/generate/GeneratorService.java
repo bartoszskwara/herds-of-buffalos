@@ -47,6 +47,7 @@ public class GeneratorService {
             User user = new User();
             user.setName(name);
             user.setEmail(name.toLowerCase().replaceAll("\\s", ".").concat("@buffalo.com"));
+            user.setPoints(new Random().longs(100L, 50000L).findFirst().orElse(0L));
             User savedUser = userRepository.save(user);
 
             Collections.shuffle(buildings);

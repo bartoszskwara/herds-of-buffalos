@@ -1,4 +1,4 @@
-package com.buffalosoftware.city;
+package com.buffalosoftware.api.city;
 
 import com.buffalosoftware.dto.building.UserBuildingDto;
 import com.buffalosoftware.entity.BuildingKey;

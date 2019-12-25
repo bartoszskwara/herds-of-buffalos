@@ -1,4 +1,4 @@
-package com.buffalosoftware.dto.building;
+package com.buffalosoftware.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-abstract class BaseDto {
+public abstract class BaseDto {
 }
