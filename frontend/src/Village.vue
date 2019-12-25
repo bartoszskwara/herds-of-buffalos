@@ -60,14 +60,16 @@ export default {
 </script>
 
 <style>
-.leftPanel {
-  float: left;
-  width: 76%;
+.villageView {
+  width: 900px;
+  min-width: 900px;
+  margin: auto;
+  height: 600px;
+  outline: 1px solid grey;
+  position: relative;
 }
-.rightPanel {
-  float: right;
-  width: 24%;
-  border-left: 1px solid grey;
-  padding-right: 20px;
+.buildingImg {
+  width: 200px;
+  position: absolute;
 }
 </style>
