@@ -31,6 +31,11 @@ export default {
   },
   methods: {
     upgrade(building) {
+      //tu by mogło być zawołanie http o ilość surków
+      // this.$http.get("http://localhost:8088/user/"+this.userArray[0].id+"/materials").then(function(data) {
+      //   this.materialsData = data.body.content;
+      // })
+
       if(building.level < building.maxLevel){
         building.level++;
       }

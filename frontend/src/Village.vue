@@ -1,13 +1,14 @@
 <template>
   <div id="village">
-      <h1>Tu powinna być wiocha</h1>
-
-
-      <md-button :key="building" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)'>
+      <h1>{{player.activeVillage}}</h1>
+      <div class="villageView">
+        <router-link class="buildingImg" v-bind:style="setVillagePosition(400,70)" to="townhall"><img src="./assets/townhall.png"/></router-link>
+        <router-link class="buildingImg" v-bind:style="setVillagePosition(100,200)" to="armory"><img src="./assets/armory.jpg"/></router-link>
+        <router-link class="buildingImg" v-bind:style="setVillagePosition(600,250)" to="barracks"><img src="./assets/barracks.png"/></router-link>
+      </div>
+      <md-button :key="building.name" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)' :disabled="building.level > 0 ? false : true">
         {{building.building.label}}
       </md-button>
-
-
   </div>
 </template>
 
@@ -19,8 +20,8 @@ export default {
   data() {
     return {
       //buildingsArray: buildingsArray,
-      buildingsArray: [],
-      playerID: 1,
+      buildingsArray: null,
+      userArray: null,
       materials: {
         wood: 3298,
         clay: 1290,
@@ -36,9 +37,15 @@ export default {
     }
   },
   created: function(){
-    this.$http.get("http://localhost:8088/user/"+this.playerID+"/building").then(function(data) {
-      this.buildingsArray = data.body.content;
-    })
+    const axios = require('axios').default;
+    axios
+      .get('http://localhost:8088/user')
+      .then(response => (
+        this.userArray = response.data.content,
+        axios
+        .get("http://localhost:8088/user/"+this.userArray[0].id+"/building")
+        .then(response => (this.buildingsArray = response.data.content))
+      ))
   },
   methods: {
     setRoute(link){
