@@ -22,4 +22,9 @@ public class UserBuildingController {
     public ResponseEntity getAllUserBuildings(@NotNull @PathVariable("userId") Long userId) {
         return ResponseEntity.ok(new BaseDtoList<>(buildingService.getUserBuildings(userId)));
     }
+
+    @GetMapping("/upgrade")
+    public ResponseEntity getUpgradePossibilities(@NotNull @PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(new BaseDtoList<>(buildingService.getUpgradePossibilities(userId)));
+    }
 }

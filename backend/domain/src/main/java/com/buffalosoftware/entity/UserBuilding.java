@@ -14,7 +14,7 @@ public class UserBuilding extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "building", nullable = false)
-    private BuildingKey building;
+    private Building building;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -23,11 +23,11 @@ public class UserBuilding extends BaseEntity {
     @Column(name = "level", nullable = false)
     private Integer level;
 
-    public BuildingKey getBuilding() {
+    public Building getBuilding() {
         return building;
     }
 
-    public void setBuilding(BuildingKey building) {
+    public void setBuilding(Building building) {
         this.building = building;
     }
 

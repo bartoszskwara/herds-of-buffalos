@@ -1,6 +1,6 @@
 package com.buffalosoftware.generate;
 
-import com.buffalosoftware.entity.BuildingKey;
+import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.entity.UserBuilding;
 import com.buffalosoftware.entity.UserResources;
@@ -46,7 +46,7 @@ public class GeneratorService {
         userRepository.deleteAll();
         userResourcesRepository.deleteAll();
 
-        List<BuildingKey> buildings = asList(BuildingKey.values());
+        List<Building> buildings = Building.list();
 
         users.forEach(name -> {
             User user = new User();

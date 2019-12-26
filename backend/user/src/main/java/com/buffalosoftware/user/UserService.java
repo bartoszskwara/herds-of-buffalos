@@ -1,6 +1,7 @@
 package com.buffalosoftware.user;
 
 import com.buffalosoftware.api.user.IUserService;
+import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.dto.user.UserDataDto;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.entity.UserResources;
@@ -31,7 +32,7 @@ public class UserService implements IUserService {
                 .points(user.getPoints())
                 .ranking(findRankByPoints(user))
                 .numberOfCities(null)//TODO
-                .resources(UserDataDto.Resources.builder()
+                .resources(ResourcesDto.builder()
                         .wood(userResources != null ? userResources.getWood(): null)
                         .clay(userResources != null ? userResources.getClay(): null)
                         .iron(userResources != null ? userResources.getIron(): null)

@@ -22,11 +22,11 @@ public class UserResources extends BaseEntity {
     @Column(name = "wood")
     private Long wood;
 
-    @Column(name = "iron")
-    private Long iron;
-
     @Column(name = "clay")
     private Long clay;
+
+    @Column(name = "iron")
+    private Long iron;
 
     @Column(name = "update_date")
     private Date updateDate;
