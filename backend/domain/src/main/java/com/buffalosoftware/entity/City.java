@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -13,7 +14,7 @@ import javax.persistence.Table;
 @Table(schema = "public", name = "city")
 public class City extends BaseEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -25,6 +26,9 @@ public class City extends BaseEntity {
 
     @Column(nullable = false, name = "coords_y")
     private Long coordsY;
+
+    @Column(nullable = false, name = "points")
+    private Long points;
 }
 
 

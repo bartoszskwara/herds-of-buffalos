@@ -3,6 +3,7 @@ package com.buffalosoftware.user;
 import com.buffalosoftware.api.user.IUserService;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.dto.user.UserDataDto;
+import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.entity.UserResources;
 import com.buffalosoftware.repository.UserRepository;
@@ -24,14 +25,15 @@ public class UserService implements IUserService {
 
     @Override
     public UserDataDto getUserData(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+        User user = userRepository.findUserWithCitiesAndResourcesById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
         UserResources userResources = user.getUserResources();
         return UserDataDto.builder()
                 .id(user.getId())
                 .name(user.getName())
-                .points(user.getPoints())
+                .points(user.getCities().stream().mapToLong(City::getPoints).sum())
                 .ranking(findRankByPoints(user))
-                .numberOfCities(null)//TODO
+                .numberOfCities(user.getCities().size())
                 .resources(ResourcesDto.builder()
                         .wood(userResources != null ? userResources.getWood(): null)
                         .clay(userResources != null ? userResources.getClay(): null)
@@ -43,5 +45,4 @@ public class UserService implements IUserService {
     private Long findRankByPoints(User user) {
         return userRepository.findRankByPoints(user.getId());
     }
-
 }

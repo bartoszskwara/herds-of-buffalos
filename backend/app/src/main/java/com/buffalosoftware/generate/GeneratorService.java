@@ -74,7 +74,6 @@ public class GeneratorService {
             User user = new User();
             user.setName(name);
             user.setEmail(name.toLowerCase().replaceAll("\\s", ".").concat("@buffalo.com"));
-            user.setPoints(new Random().longs(100L, 50000L).findFirst().orElse(0L));
             User savedUser = userRepository.save(user);
 
             Collections.shuffle(buildings);
@@ -111,6 +110,7 @@ public class GeneratorService {
         city.setName("City of " + savedUser.getName() + " " + RandomStringUtils.randomAlphabetic(4));
         city.setCoordsX(x);
         city.setCoordsY(y);
+        city.setPoints(new Random().longs(100L, 10000L).findFirst().orElse(0L));
         cityRepository.save(city);
         points.remove(i);
     }

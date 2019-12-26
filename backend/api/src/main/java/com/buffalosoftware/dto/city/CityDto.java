@@ -13,4 +13,5 @@ public class CityDto extends BaseDto {
     private String name;
     private Long coordX;
     private Long coordY;
+    private Long points;
 }

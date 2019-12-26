@@ -14,7 +14,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u join fetch u.userBuildings join fetch u.userResources where u.id = :userId")
     Optional<User> findUserWithBuildingsAndResourcesById(@Param("userId") Long userId);
 
-    @Query(value = "select u.rank from (select row_number() over (order by points desc) as rank, id FROM USER) u where u.id = :userId",
+    @Query("select u from User u join fetch u.cities join fetch u.userResources where u.id = :userId")
+    Optional<User> findUserWithCitiesAndResourcesById(@Param("userId") Long userId);
+
+    @Query(value = "select u.rank from " +
+            "(select row_number() over (order by points desc) as rank, id " +
+                "FROM (select us.id as id, sum(points) as points from user us left join city c on us.id = c.user_id group by us.id) ) u " +
+                "where u.id = :userId",
             nativeQuery = true)
     Long findRankByPoints(@Param("userId") Long userId);
 }

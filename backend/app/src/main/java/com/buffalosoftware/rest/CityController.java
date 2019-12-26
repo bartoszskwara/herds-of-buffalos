@@ -29,10 +29,11 @@ public class CityController {
                 .map(city -> CityDto.builder()
                         .user(UserDto.builder()
                                 .id(city.getUser().getId())
-                                .name(city.getName()).build())
+                                .name(city.getUser().getName()).build())
                         .name(city.getName())
                         .coordX(city.getCoordsX())
                         .coordY(city.getCoordsY())
+                        .points(city.getPoints())
                         .build())
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new BaseDtoList<>(cities));

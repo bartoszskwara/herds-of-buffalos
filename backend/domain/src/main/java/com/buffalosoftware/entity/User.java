@@ -1,5 +1,8 @@
 package com.buffalosoftware.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -12,71 +15,30 @@ import java.util.Set;
 @Table(schema = "public", name = "user")
 public class User extends BaseEntity {
 
+    @Getter
+    @Setter
     @Column(nullable = false, name = "name")
     private String name;
 
+    @Getter
+    @Setter
     @Column(nullable = false, name = "email")
     private String email;
 
-    @Column(nullable = false, name = "points")
-    private Long points;
-
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "user")
     private Set<UserBuilding> userBuildings = new HashSet<>();
 
+    @Getter
+    @Setter
     @OneToOne(mappedBy = "user")
     private UserResources userResources;
 
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "user")
     private Set<City> cities = new HashSet<>();
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Set<UserBuilding> getUserBuildings() {
-        return userBuildings;
-    }
-
-    public void setUserBuildings(Set<UserBuilding> userBuildings) {
-        this.userBuildings = userBuildings;
-    }
-
-    public Long getPoints() {
-        return points;
-    }
-
-    public void setPoints(Long points) {
-        this.points = points;
-    }
-
-    public UserResources getUserResources() {
-        return userResources;
-    }
-
-    public void setUserResources(UserResources userResources) {
-        this.userResources = userResources;
-    }
-
-    public Set<City> getCities() {
-        return cities;
-    }
-
-    public void setCities(Set<City> cities) {
-        this.cities = cities;
-    }
 }
 
 
