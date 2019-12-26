@@ -27,6 +27,9 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user")
     private UserResources userResources;
 
+    @OneToMany(mappedBy = "user")
+    private Set<City> cities = new HashSet<>();
+
     public String getName() {
         return name;
     }
@@ -65,6 +68,14 @@ public class User extends BaseEntity {
 
     public void setUserResources(UserResources userResources) {
         this.userResources = userResources;
+    }
+
+    public Set<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<City> cities) {
+        this.cities = cities;
     }
 }
 
