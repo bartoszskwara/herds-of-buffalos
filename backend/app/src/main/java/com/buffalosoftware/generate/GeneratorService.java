@@ -43,8 +43,8 @@ public class GeneratorService {
 
     void generate() {
         userBuildingRepository.deleteAll();
-        userRepository.deleteAll();
         userResourcesRepository.deleteAll();
+        userRepository.deleteAll();
 
         List<Building> buildings = Building.list();
 
