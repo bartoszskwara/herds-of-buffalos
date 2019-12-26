@@ -6,10 +6,9 @@
       <div class="leftPanel">
         <router-view></router-view>
       </div>
-
       <div class="rightPanel">
         <player-info :player="player"></player-info>
-        <material-panel :materials="materials"></material-panel>
+        <resources-panel :resources="player.resources"></resources-panel>
         <troops-panel :troops="troopsArray"></troops-panel>
       </div>
     </div>
@@ -18,30 +17,31 @@
 
 <script>
 import NavigationBar from "./NavigationBar.vue";
-import MaterialPanel from "./MaterialPanel.vue";
+import ResourcesPanel from "./ResourcesPanel.vue";
 import PlayerInfo from "./PlayerInfo.vue";
 import TroopsPanel from "./TroopsPanel.vue";
 import troopsArray from "./assets/troops.js";
 
 export default {
-  components: {NavigationBar, MaterialPanel, PlayerInfo, TroopsPanel},
+  components: {NavigationBar, ResourcesPanel, PlayerInfo, TroopsPanel},
   data(){
     return {
       troopsArray: troopsArray,
-      materials: {
-        wood: 3298,
-        clay: 1290,
-        iron: 333
-      },
-      player: {
-        nick: "Bawół Świeczka",
-        score: 12123,
-        ranking: 3,
-        villageCount: 1,
-        activeVillage: "Miasto Bawol"
-      },
+      userArray: [],
+      player: {resources: {}},
     }
-  }
+  },
+  mounted: function(){
+    const axios = require('axios').default;
+    axios
+      .get('http://localhost:8088/user')
+      .then(response => (
+        this.userArray = response.data.content,
+        axios
+        .get("http://localhost:8088/user/"+this.userArray[0].id)
+        .then(response => (this.player = response.data))
+      ))
+  },
 }
 </script>
 
