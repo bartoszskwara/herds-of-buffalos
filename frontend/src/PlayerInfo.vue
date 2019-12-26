@@ -8,18 +8,18 @@
           <img src="https://placeimg.com/40/40/people/5" alt="People">
         </md-avatar>
         <div class="md-list-item-text nick">
-          <span>{{player.nick}}</span>
+          <span>{{player.name}}</span>
           <span>Nick</span>
         </div>
       </md-list-item>
 
       <md-list-item>
         <div class="md-list-item-text second">
-          <span>{{player.score}}</span>
+          <span>{{player.points}}</span>
           <span>Punkty</span>
         </div>
         <div class="md-list-item-text">
-          <span>{{player.villageCount}}</span>
+          <span>{{player.villageCount}}UNKNOWN</span>
           <span>Ilość wiosek</span>
         </div>
         <div class="md-list-item-text">
@@ -30,7 +30,7 @@
 
       <md-list-item>
         <div class="md-list-item-text">
-          <span>{{player.activeVillage}}</span>
+          <span>{{player.activeVillage}}UNKNOWN</span>
           <span>Aktywna wioska</span>
         </div>
       </md-list-item>

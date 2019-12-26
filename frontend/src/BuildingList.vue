@@ -1,7 +1,9 @@
 <template>
   <div id="buildings">
-    <md-list class="md-double-line" :key="building.name" v-for="building in buildings">
-      <building v-bind:building="building"></building>
+    <p>{{val}}</p>
+    <md-list class="md-double-line" :key="building.building.key" v-for="building in buildingsArray">
+      <building :building="building"></building>
+
       <md-list-item>
         <div class="md-list-item-text">
           <md-button class="md-raised md-primary" @click="upgrade(building)">Rozbuduj</md-button>
@@ -12,7 +14,7 @@
     <md-dialog-alert
       :md-active.sync="alertMaxLevel"
       md-title="Dalsza rozbudowa niemożliwa!"
-      md-content="Ten budynek został już rozbudowany do najwyższego poziomu!" />
+      :md-content="alertText" />
   </div>
 </template>
 
@@ -21,13 +23,37 @@ import Building from "./Building.vue";
 
 export default {
   components: {Building},
-  props: {
-    buildings: Array
-  },
   data() {
     return {
-      alertMaxLevel: false
+      alertMaxLevel: false,
+      alertText: "",
+      buildingsArray: [{
+        building: Object,
+        nextLevel: Number,
+        cost: Object,
+        requiredBuildings: [],
+        requirementsMet: false,
+        }],
+      userArray: null,
+      player: {resources: {}},
+      val: 10,
     }
+  },
+  created: function(){
+    const axios = require('axios').default;
+    axios
+      .get('http://localhost:8088/user')
+      .then(response => (
+        this.userArray = response.data.content,
+        axios
+        .get("http://localhost:8088/user/"+this.userArray[0].id+"/building/upgrade")
+        .then(response => (
+          this.buildingsArray = response.data.content,
+          axios
+              .get("http://localhost:8088/user/"+this.userArray[0].id)
+              .then(response => (this.player = response.data))
+        ))
+      ))
   },
   methods: {
     upgrade(building) {
@@ -36,10 +62,19 @@ export default {
       //   this.materialsData = data.body.content;
       // })
 
-      if(building.level < building.maxLevel){
-        building.level++;
+      if(building.nextLevel <= building.building.maxLevel){
+        if(this.player.resources.wood >= building.cost.wood
+        && this.player.resources.clay >= building.cost.clay
+        && this.player.resources.iron >= building.cost.iron){
+          building.nextLevel++;
+        }
+        else {
+          this.alertText = "Brak zasobów na rozbudowę tego budynku!";
+          this.alertMaxLevel = true;
+        }
       }
       else {
+        this.alertText = "Ten budynek został już rozbudowany do najwyższego poziomu!";
         this.alertMaxLevel = true;
       }
     }

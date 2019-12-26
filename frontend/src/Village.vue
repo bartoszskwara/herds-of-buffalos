@@ -6,7 +6,7 @@
         <router-link class="buildingImg" v-bind:style="setBuildingPosition(100,200)" to="armory"><img src="./assets/armory.jpg"/></router-link>
         <router-link class="buildingImg" v-bind:style="setBuildingPosition(600,250)" to="barracks"><img src="./assets/barracks.png"/></router-link>
       </div>
-      <md-button :key="building.name" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)' :disabled="building.level > 0 ? false : true">
+      <md-button :key="building.building.key" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)' :disabled="building.level > 0 ? false : true">
         {{building.building.label}}
       </md-button>
   </div>

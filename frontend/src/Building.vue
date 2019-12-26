@@ -2,12 +2,12 @@
   <div id="building">
 
     <md-toolbar :md-elevation="1" @click.native='setRoute(building.link)'>
-      <span class="md-title">{{building.name}}</span>
+      <span class="md-title">{{building.building.label}}</span>
     </md-toolbar>
       <md-list-item>
         <md-icon :md-src="require('./assets/bricks.svg')" />
         <div class="md-list-item-text level">
-          <span>{{building.level}}</span>
+          <span>{{building.nextLevel - 1}}</span>
           <span>Poziom</span>
         </div>
       </md-list-item>
@@ -17,17 +17,17 @@
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
-          <span>{{building.price.wood}}</span>
+          <span>{{building.cost.wood}}</span>
         </div>
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
-          <span>{{building.price.clay}}</span>
+          <span>{{building.cost.clay}}</span>
         </div>
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
-          <span>{{building.price.iron}}</span>
+          <span>{{building.cost.iron}}</span>
         </div>
       </md-list-item>
 

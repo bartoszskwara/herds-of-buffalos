@@ -17,8 +17,8 @@ const mapVillages = [
       player: "Kuba",
       points: 97,
       name: "Kraków",
-      x: 5,
-      y: 3,
+      x: 19,
+      y: 13,
     },
     {
       player: "Mateusz",

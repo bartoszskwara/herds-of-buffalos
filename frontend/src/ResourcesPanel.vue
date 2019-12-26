@@ -1,22 +1,22 @@
 <template>
-  <div id="materials">
+  <div id="resources">
     <md-list class="md-double-line">
       <md-subheader>Surowce</md-subheader>
       <md-list-item layout="row">
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
-          <span>{{materials.wood}}</span>
+          <span>{{resources.wood}}</span>
         </div>
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
-          <span>{{materials.clay}}</span>
+          <span>{{resources.clay}}</span>
         </div>
 
         <div class="md-list-item-text">
           <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
-          <span>{{materials.iron}}</span>
+          <span>{{resources.iron}}</span>
         </div>
       </md-list-item>
     </md-list>
@@ -27,7 +27,7 @@
 
 export default {
   props: {
-    materials: Object
+    resources: Object
   },
 }
 </script>
