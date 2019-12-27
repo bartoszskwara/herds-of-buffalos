@@ -1,5 +1,5 @@
 <template>
-  <div id="player">
+  <div id="offer">
     <div class="offer">
       <md-toolbar :md-elevation="1">
         <span class="md-title">Utwórz ofertę wymiany</span>

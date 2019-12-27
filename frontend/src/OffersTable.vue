@@ -30,7 +30,7 @@
           </span>
         </md-table-cell>
         <md-table-cell md-label="Data utworzenia">{{ item.date }}</md-table-cell>
-        <md-table-cell md-label="Data utworzenia">
+        <md-table-cell>
           <md-button class="md-raised md-primary" @click="acceptOffer()">Przyjmij ofertę</md-button>
         </md-table-cell>
       </md-table-row>
@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     acceptOffer(){
-      
+
     }
   }
 }

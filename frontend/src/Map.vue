@@ -4,6 +4,7 @@
     <div class="mapView">
       <div class="wioska" v-bind:key="village.name" v-for="village in allCities"
         v-bind:style="stylePositionVillage(village)" @click="villageClicked(village)">
+        <div class="activeCity" v-if="village.user.id == 1"></div>
         <img :src="setVillageImage(village)" />
         <md-tooltip md-direction="top"><b>Gracz:</b>  {{village.user.name}}
         <br><b>Wioska:</b>  {{village.name}}
@@ -20,7 +21,7 @@
 
       <div class="dialogButtons">
         <md-button class="md-raised md-accent">Wyślij wojska</md-button>
-        <md-button class="md-raised md-primary">Profil gracza</md-button>
+        <md-button class="md-raised md-primary" @click="showProfile(chosenVillage.user.id)">Profil gracza</md-button>
       </div>
     </md-dialog>
 
@@ -38,28 +39,32 @@ export default {
       squareSizeY: 40,
       imagePath: String,
       villageDialog: false,
-      chosenVillage: {user:{}},
+      chosenVillage: {
+        user:{
+          id: Number,
+        }
+      },
       allCities: [],
     }
   },
   mounted: function(){
     const axios = require('axios').default;
-    var i = -1;
+    var i = 0;
 
     axios
     .get('http://localhost:8088/user')
     .then(response => (
       response.data.content.forEach(() => {
-        i++;
-        var j = -1;
+        var j = 0;
         axios
         .get("http://localhost:8088/user/"+response.data.content[i].id+"/city")
         .then(response => (
           response.data.content.forEach(() => {
-            j++;
             this.allCities.push(response.data.content[j]);
+            j++;
           }
         )))
+        i++;
       }) ));
     },
     methods: {
@@ -85,6 +90,9 @@ export default {
       villageClicked(village){
         this.chosenVillage = village;
         this.villageDialog = true;
+      },
+      showProfile(id){
+        this.$router.push({ name: 'profile', params: {userId: id }})
       }
     }
   }
@@ -127,6 +135,15 @@ export default {
     width: 45px;
     text-align: center;
     cursor: pointer;
+  }
+  .activeCity {
+    background-color: #00ff1a;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    left: 5px;
+    border-radius: 15px;
+    border: 1px solid black;
   }
   .md-tooltip {
     height: auto !important;

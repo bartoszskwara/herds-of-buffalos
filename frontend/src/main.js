@@ -8,6 +8,7 @@ import Barracks from './Barracks.vue'
 import Armory from './Armory.vue'
 import Map from './Map.vue'
 import Market from './Market.vue'
+import Profile from './Profile.vue'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
@@ -31,7 +32,8 @@ const router = new VueRouter({
     { path: '/market', component: Market },
     { path: '/map', component: Map },
     { path: '/scoreboard', component: Scoreboard },
-    { path: '/reports', component: Reports }
+    { path: '/reports', component: Reports },
+    { path: '/profile', name: 'profile', component: Profile, props: true}
   ]
 })
 

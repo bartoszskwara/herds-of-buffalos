@@ -3,16 +3,15 @@
     <md-list class="md-double-line">
       <md-subheader>Informacje</md-subheader>
 
-      <md-list-item>
+      <md-list-item md-expand>
         <md-avatar>
           <img src="https://placeimg.com/40/40/people/5" alt="People">
         </md-avatar>
-        <div class="md-list-item-text nick">
+        <div class="md-list-item-text">
           <span>{{player.name}}</span>
           <span>Nick</span>
         </div>
-      </md-list-item>
-
+        <md-list slot="md-expand">
       <md-list-item>
         <div class="md-list-item-text second">
           <span>{{player.points}}</span>
@@ -35,6 +34,9 @@
         </div>
       </md-list-item>
     </md-list>
+
+      </md-list-item>
+    </md-list>
   </div>
 </template>
 
@@ -55,7 +57,5 @@ export default {
 .md-list-item-text span {
   text-align: center !important;
 }
-.nick {
-  padding-right: 35%;
-}
+
 </style>
