@@ -19,7 +19,7 @@
           <span>Punkty</span>
         </div>
         <div class="md-list-item-text">
-          <span>{{player.villageCount}}UNKNOWN</span>
+          <span>{{player.numberOfCities}}</span>
           <span>Ilość wiosek</span>
         </div>
         <div class="md-list-item-text">
@@ -30,7 +30,7 @@
 
       <md-list-item>
         <div class="md-list-item-text">
-          <span>{{player.activeVillage}}UNKNOWN</span>
+          <span>{{cities[0].name}}</span>
           <span>Aktywna wioska</span>
         </div>
       </md-list-item>
@@ -42,7 +42,8 @@
 
 export default {
   props: {
-    player: Object
+    player: Object,
+    cities: Array
   },
 }
 </script>

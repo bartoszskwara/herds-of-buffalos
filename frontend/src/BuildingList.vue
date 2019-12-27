@@ -1,6 +1,5 @@
 <template>
   <div id="buildings">
-    <p>{{val}}</p>
     <md-list class="md-double-line" :key="building.building.key" v-for="building in buildingsArray">
       <building :building="building"></building>
 

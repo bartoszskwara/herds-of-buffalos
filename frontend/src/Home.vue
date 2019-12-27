@@ -7,7 +7,7 @@
         <router-view></router-view>
       </div>
       <div class="rightPanel">
-        <player-info :player="player"></player-info>
+        <player-info :player="player" :cities="cities"></player-info>
         <resources-panel :resources="player.resources"></resources-panel>
         <troops-panel :troops="troopsArray"></troops-panel>
       </div>
@@ -29,6 +29,7 @@ export default {
       troopsArray: troopsArray,
       userArray: [],
       player: {resources: {}},
+      cities: [{}],
     }
   },
   mounted: function(){
@@ -39,7 +40,12 @@ export default {
         this.userArray = response.data.content,
         axios
         .get("http://localhost:8088/user/"+this.userArray[0].id)
-        .then(response => (this.player = response.data))
+        .then(response => (
+          this.player = response.data,
+          axios
+          .get("http://localhost:8088/user/"+this.userArray[0].id+"/city")
+          .then(response => (this.cities = response.data.content))
+        ))
       ))
   },
 }
