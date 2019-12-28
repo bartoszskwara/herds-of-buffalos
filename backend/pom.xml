@@ -22,6 +22,7 @@
         <java.version>13</java.version>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <project.version>1.0-SNAPSHOT</project.version>
+        <swagger.version>2.9.2</swagger.version>
     </properties>
 
     <dependencyManagement>
@@ -95,6 +96,17 @@
                 <groupId>com.buffalosoftware</groupId>
                 <artifactId>user</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
