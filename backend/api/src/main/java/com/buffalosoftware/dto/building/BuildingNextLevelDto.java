@@ -11,8 +11,9 @@ import java.util.List;
 @Builder
 public class BuildingNextLevelDto extends BaseDto {
     private BuildingDto building;
+    private Integer currentLevel;
     private Integer nextLevel;
     private ResourcesDto cost;
     private List<BuildingDto> requiredBuildings;
-    private boolean requirementsMet;
+    private Boolean requirementsMet;
 }

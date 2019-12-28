@@ -6,7 +6,6 @@ import com.buffalosoftware.dto.building.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,9 +29,9 @@ public class UserController {
         return ResponseEntity.ok(new BaseDtoList<>(users));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity getUserData(@PathVariable("userId") Long userId) {
-
-        return ResponseEntity.ok(userService.getUserData(userId));
+    @GetMapping("/current")
+    public ResponseEntity getCurrentLoggedUser() {
+        //TODO temporary implementation
+        return ResponseEntity.ok(userService.findRandomUserWithMultipleCities());
     }
 }

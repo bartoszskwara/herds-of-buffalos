@@ -12,16 +12,16 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(schema = "public", name = "user_building")
-public class UserBuilding extends BaseEntity {
+@Table(schema = "public", name = "city_building")
+public class CityBuilding extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "building", nullable = false)
     private Building building;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "city_id", nullable = false)
+    private City city;
 
     @Column(name = "level", nullable = false)
     private Integer level;

@@ -3,24 +3,29 @@ package com.buffalosoftware.building;
 import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.dto.building.BuildingDto;
 import com.buffalosoftware.dto.building.BuildingNextLevelDto;
-import com.buffalosoftware.dto.building.UserBuildingDto;
+import com.buffalosoftware.dto.building.CityBuildingDto;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.entity.Building;
+import com.buffalosoftware.entity.City;
+import com.buffalosoftware.entity.CityBuilding;
+import com.buffalosoftware.entity.CityResources;
+import com.buffalosoftware.entity.Resource;
 import com.buffalosoftware.entity.User;
-import com.buffalosoftware.entity.UserBuilding;
 import com.buffalosoftware.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
+import static com.buffalosoftware.entity.Resource.clay;
+import static com.buffalosoftware.entity.Resource.iron;
+import static com.buffalosoftware.entity.Resource.wood;
 import static java.util.Collections.emptyList;
 
 @Service
@@ -31,35 +36,35 @@ public class BuildingService implements IBuildingService {
 
     @Override
     public List<Building> getAllAvailableBuildings() {
-        return asList(Building.values());
+        return Building.list();
     }
 
     @Override
-    public List<UserBuildingDto> getUserBuildings(Long userId) {
-        User user = userRepository.findUserWithBuildingsById(userId).orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
-        Map<Building, UserBuilding> userBuildingsByKey = user.getUserBuildings().stream().collect(Collectors.toMap(UserBuilding::getBuilding, Function.identity()));
+    public List<CityBuildingDto> getCityBuildings(Long userId, Long cityId) {
+        User user = userRepository.findUserWithCitiesAndBuildingsById(userId).orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+        City city = user.getCities().stream()
+                .filter(c -> c.getId().equals(cityId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("City doesn't exist"));
 
-        List<UserBuildingDto> userBuildings = user.getUserBuildings().stream()
+        Map<Building, CityBuilding> cityBuildingsByKey = city.getCityBuildings().stream()
+                .collect(Collectors.toMap(CityBuilding::getBuilding, Function.identity()));
+        List<CityBuildingDto> cityBuildings = city.getCityBuildings().stream()
                 .map(ub -> createUserBuilding(ub.getBuilding(), ub.getLevel()))
                 .collect(Collectors.toList());
-        List<UserBuildingDto> notBuiltBuildings = getAllAvailableBuildings().stream()
-                .filter(b -> !userBuildingsByKey.keySet().contains(b))
+        List<CityBuildingDto> notBuiltBuildings = getAllAvailableBuildings().stream()
+                .filter(b -> !cityBuildingsByKey.keySet().contains(b))
                 .map(b -> createUserBuilding(b, 0))
                 .collect(Collectors.toList());
-        userBuildings.addAll(notBuiltBuildings);
+        cityBuildings.addAll(notBuiltBuildings);
 
-        return userBuildings.stream()
+        return cityBuildings.stream()
                 .sorted(Comparator.comparing(b -> b.getBuilding().getLabel()))
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<User> getUserWithBuildings(Long userId) {
-        return userRepository.findUserWithBuildingsById(userId);
-    }
-
-    private UserBuildingDto createUserBuilding(Building building, Integer level) {
-        return UserBuildingDto.builder()
+    private CityBuildingDto createUserBuilding(Building building, Integer level) {
+        return CityBuildingDto.builder()
                 .building(BuildingDto.builder()
                         .key(building)
                         .label(building.getName())
@@ -69,47 +74,66 @@ public class BuildingService implements IBuildingService {
     }
 
     @Override
-    public List<BuildingNextLevelDto> getUpgradePossibilities(Long userId) {
-        User user = userRepository.findUserWithBuildingsAndResourcesById(userId)
+    public List<BuildingNextLevelDto> getUpgradePossibilities(Long userId, Long cityId) {
+        User user = userRepository.findUserWithCitiesAndBuildingsAndResourcesById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
-        Map<Building, Integer> userBuildingsWithLevels = user.getUserBuildings().stream()
-                .collect(Collectors.toMap(UserBuilding::getBuilding, UserBuilding::getLevel));
+        City city = user.getCities().stream()
+                .filter(c -> c.getId().equals(cityId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("City doesn't exist"));
+        Map<Building, Integer> cityBuildingsWithLevels = city.getCityBuildings().stream()
+                .collect(Collectors.toMap(CityBuilding::getBuilding, CityBuilding::getLevel));
         return Building.list().stream()
-                .map(building -> {
-                    Integer nexLevel = getNextLevelOfBuilding(building, userBuildingsWithLevels);
-                    ResourcesDto resources = ResourcesDto.builder()
-                            .wood(building.getWoodCostForLevel(nexLevel))
-                            .clay(building.getClayCostForLevel(nexLevel))
-                            .iron(building.getIronCostForLevel(nexLevel))
-                            .build();
-                    return BuildingNextLevelDto.builder()
-                            .building(BuildingDto.builder()
-                                    .key(building)
-                                    .label(building.getName())
-                                    .maxLevel(building.getMaxLevel()).build())
-                            .nextLevel(nexLevel)
-                            .cost(resources)
-                            .requiredBuildings(emptyList())
-                            .requirementsMet(areRequirementsMetForBuilding(user, resources))
-                            .build();
-                })
+                .map(building -> createBuildingNextLevelDto(building, city, cityBuildingsWithLevels.get(building)))
                 .collect(Collectors.toList());
     }
 
-    private boolean areRequirementsMetForBuilding(User user, ResourcesDto resourcesCost) {
-        if(user.getUserResources().getWood() < resourcesCost.getWood()
-                || user.getUserResources().getClay() < resourcesCost.getClay()
-                || user.getUserResources().getIron() < resourcesCost.getIron()) {
-            return false;
+    private BuildingNextLevelDto createBuildingNextLevelDto(Building building, City city, Integer currentBuildingLevel) {
+        BuildingNextLevelDto.BuildingNextLevelDtoBuilder buildingNextLevelDto = BuildingNextLevelDto.builder()
+                .building(BuildingDto.builder()
+                        .key(building)
+                        .label(building.getName())
+                        .maxLevel(building.getMaxLevel()).build())
+                .currentLevel(currentBuildingLevel != null ? currentBuildingLevel : 0);
+        Integer nexLevel = getNextLevelOfBuilding(currentBuildingLevel, building.getMaxLevel());
+        if(nexLevel != null) {
+            ResourcesDto resources = ResourcesDto.builder()
+                    .wood(building.getWoodCostForLevel(nexLevel))
+                    .clay(building.getClayCostForLevel(nexLevel))
+                    .iron(building.getIronCostForLevel(nexLevel))
+                    .build();
+            buildingNextLevelDto
+                    .nextLevel(nexLevel)
+                    .cost(resources)
+                    .requiredBuildings(emptyList())
+                    .requirementsMet(areRequirementsMetForBuilding(city, resources));
         }
-        //TODO: add checking if required buildings are built
-        return true;
+        return buildingNextLevelDto.build();
     }
 
-    private Integer getNextLevelOfBuilding(Building building, Map<Building, Integer> userBuildingsWithLevels) {
-        Integer nextLevel = userBuildingsWithLevels.getOrDefault(building, 0) + 1;
-        return nextLevel <= building.getMaxLevel() ? nextLevel : null;
+    private boolean areRequirementsMetForBuilding(City city, ResourcesDto resourcesCost) {
+        Set<CityResources> cityResources = city.getCityResources();
+        //TODO add checking buildings requirements
+        return getAmountOf(wood, cityResources) >= resourcesCost.getWood()
+                && getAmountOf(clay, cityResources) >= resourcesCost.getClay()
+                && getAmountOf(iron, cityResources) >= resourcesCost.getIron();
     }
 
+    private Integer getNextLevelOfBuilding(Integer currentBuildingLevel, Integer buildingMaxLevel) {
+        Integer nextLevel = currentBuildingLevel != null ? currentBuildingLevel + 1 : 1;
+        return nextLevel <= buildingMaxLevel ? nextLevel : null;
+    }
+
+    private Long getAmountOf(Resource resource, Set<CityResources> resources) {
+        if(CollectionUtils.isEmpty(resources) || resource == null) {
+            return 0L;
+        }
+
+        return resources.stream()
+                .filter(r -> resource.equals(r.getResource()))
+                .findFirst()
+                .map(CityResources::getAmount)
+                .orElse(0L);
+    }
 
 }

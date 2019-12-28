@@ -6,7 +6,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserBuildingDto extends BaseDto {
+public class CityBuildingDto extends BaseDto {
     private BuildingDto building;
     private Integer level;
+    private boolean isUnderConstruction;
 }

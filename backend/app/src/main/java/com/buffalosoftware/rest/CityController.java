@@ -1,6 +1,5 @@
 package com.buffalosoftware.rest;
 
-import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.api.city.ICityService;
 import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.dto.building.UserDto;
@@ -30,6 +29,7 @@ public class CityController {
                         .user(UserDto.builder()
                                 .id(city.getUser().getId())
                                 .name(city.getUser().getName()).build())
+                        .id(city.getId())
                         .name(city.getName())
                         .coordX(city.getCoordsX())
                         .coordY(city.getCoordsY())
@@ -38,5 +38,12 @@ public class CityController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new BaseDtoList<>(cities));
     }
+
+    @GetMapping("/{cityId}")
+    public ResponseEntity getCityData(@NotNull @PathVariable("userId") Long userId,
+                                           @NotNull @PathVariable("cityId") Long cityId) {
+        return ResponseEntity.ok(cityService.getCityData(userId, cityId));
+    }
+
 
 }
