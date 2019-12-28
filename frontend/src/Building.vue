@@ -1,7 +1,7 @@
 <template>
   <div id="building">
 
-    <md-toolbar :md-elevation="1" @click.native='setRoute(building.link)'>
+    <md-toolbar :md-elevation="1" @click.native='setRoute(building.building.key)'>
       <span class="md-title">{{building.building.label}}</span>
     </md-toolbar>
       <md-list-item>

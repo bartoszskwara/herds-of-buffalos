@@ -29,7 +29,7 @@
 
       <md-list-item>
         <div class="md-list-item-text">
-          <span>{{cities[0].name}}</span>
+          <span>{{activeCity.name}}</span>
           <span>Aktywna wioska</span>
         </div>
       </md-list-item>
@@ -45,7 +45,7 @@
 export default {
   props: {
     player: Object,
-    cities: Array
+    activeCity: Object
   },
 }
 </script>

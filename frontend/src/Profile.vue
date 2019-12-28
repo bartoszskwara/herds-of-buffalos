@@ -2,7 +2,7 @@
   <div id="market">
     <div class="container">
     <md-list class="md-double-line">
-      <md-subheader>Profil</md-subheader>
+      <md-subheader>Profil{{userId}}</md-subheader>
 
       <md-list-item>
         <md-avatar>
@@ -72,16 +72,16 @@ export default {
   },
   created: function(){
     const axios = require('axios').default;
-    axios
-      .get('http://localhost:8088/user/'+this.userId)
-      .then(response => (
-        this.player = response.data,
+    // axios
+    //   .get('http://localhost:8088/user/'+this.userId)
+    //   .then(response => (
+    //     this.player = response.data,
         axios
           .get('http://localhost:8088/user/'+this.userId+'/city')
           .then(response => (
             this.cities = response.data.content
           ))
-      ))
+      // ))
   },
 }
 </script>

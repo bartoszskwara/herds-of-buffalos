@@ -14,36 +14,21 @@
 
 <script>
 
-//import buildingsArray from "./assets/buildings.js";
-
 export default {
   data() {
     return {
-      //buildingsArray: buildingsArray,
       buildingsArray: null,
-      userArray: null,
-      materials: {
-        wood: 3298,
-        clay: 1290,
-        iron: 333
-      },
-      player: {
-        nick: "Bawół Świeczka",
-        score: 12123,
-        ranking: 3,
-        villageCount: 1,
-        activeVillage: "Miasto Bawol"
-      },
+      player: Object,
     }
   },
   created: function(){
     const axios = require('axios').default;
     axios
-      .get('http://localhost:8088/user')
+      .get('http://localhost:8088/user/current')
       .then(response => (
-        this.userArray = response.data.content,
+        this.player = response.data,
         axios
-        .get("http://localhost:8088/user/"+this.userArray[0].id+"/building")
+        .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building")
         .then(response => (this.buildingsArray = response.data.content))
       ))
   },

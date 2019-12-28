@@ -7,8 +7,8 @@
         <router-view></router-view>
       </div>
       <div class="rightPanel">
-        <player-info :player="player" :cities="cities"></player-info>
-        <resources-panel :resources="player.resources"></resources-panel>
+        <player-info :player="player" :activeCity="activeCity"></player-info>
+        <resources-panel :resources="activeCity.resources"></resources-panel>
         <troops-panel :troops="troopsArray"></troops-panel>
       </div>
     </div>
@@ -27,25 +27,19 @@ export default {
   data(){
     return {
       troopsArray: troopsArray,
-      userArray: [],
-      player: {resources: {}},
-      cities: [{}],
+      player: {},
+      activeCity: {resources: {}},
     }
   },
   mounted: function(){
     const axios = require('axios').default;
-    axios
-      .get('http://localhost:8088/user')
+      axios
+      .get("http://localhost:8088/user/current")
       .then(response => (
-        this.userArray = response.data.content,
+        this.player = response.data,
         axios
-        .get("http://localhost:8088/user/"+this.userArray[0].id)
-        .then(response => (
-          this.player = response.data,
-          axios
-          .get("http://localhost:8088/user/"+this.userArray[0].id+"/city")
-          .then(response => (this.cities = response.data.content))
-        ))
+        .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId)
+        .then(response => (this.activeCity = response.data))
       ))
   },
 }

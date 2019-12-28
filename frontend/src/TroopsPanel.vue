@@ -88,8 +88,8 @@ export default {
 }
 .progressBar {
   margin-bottom: 10px;
-  background-color: #e8c1b0 !important;
-  --md-theme-default-accent: #c75d30;
+  background-color: #c5edcf !important;
+  --md-theme-default-accent: #1db847;
 }
 .progressLabel {
   color: grey;
