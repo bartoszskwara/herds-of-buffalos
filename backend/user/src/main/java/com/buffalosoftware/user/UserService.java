@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.buffalosoftware.entity.Building.barracks;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
@@ -26,8 +28,12 @@ public class UserService implements IUserService {
         List<User> allUsers = userRepository.findAll();
         User user = allUsers.stream()
                 .filter(u -> u.getCities().size() > 1)
+                .filter(u -> u.getCities().stream()
+                        .anyMatch(city -> city.getCityBuildings().stream()
+                                .anyMatch(cityBuilding -> barracks.equals(cityBuilding.getBuilding()))))
                 .findFirst()
                 .orElse(allUsers.stream()
+                        .filter(u -> u.getCities().size() > 1)
                         .findAny()
                         .orElseThrow(() -> new IllegalArgumentException("No users in database!")));
         return UserDto.builder()
