@@ -5,6 +5,9 @@ import Reports from './Reports.vue'
 import Village from './Village.vue'
 import TownHall from './TownHall.vue'
 import Barracks from './Barracks.vue'
+import Pasture from './Pasture.vue'
+import Shipyard from './Shipyard.vue'
+import MachineFactory from './MachineFactory.vue'
 import Armory from './Armory.vue'
 import Map from './Map.vue'
 import Market from './Market.vue'
@@ -28,6 +31,9 @@ const router = new VueRouter({
     { path: '/', component: Village },
     { path: '/townhall', component: TownHall },
     { path: '/barracks', component: Barracks },
+    { path: '/pasture', component: Pasture },
+    { path: '/shipyard', component: Shipyard },
+    { path: '/machinefactory', component: MachineFactory },
     { path: '/armory', component: Armory },
     { path: '/market', component: Market },
     { path: '/map', component: Map },

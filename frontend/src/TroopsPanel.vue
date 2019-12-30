@@ -10,15 +10,19 @@
         </div>
       </md-list-item>
 
-      <md-list-item :key="troop.name" v-for="troop in nonzeroTroops">
-
-        <md-icon>face</md-icon>
-        <div class="md-list-item-text">
-          <span>{{troop.name}}</span>
+      <md-list-item :key="troop.key" v-for="troop in troops">
+        <div class="md-list-item-text" style="flex-grow: 1">
+          <md-icon>face</md-icon>
+        </div>
+        <div class="md-list-item-text" style="flex-grow: 2">
+          <span>{{troop.label}}</span>
           <span>Rodzaj</span>
         </div>
-        <div class="md-list-item-text">
-          <span>{{troop.count}}</span>
+        <div class="md-list-item-text level" style="flex-grow: 1.5">
+          <md-icon class="star" :md-src="require('./assets/star.svg')" v-bind:key="n" v-for="n in troop.level">{{n}}</md-icon>
+        </div>
+        <div class="md-list-item-text" style="flex-grow: 1">
+          <span>{{troop.amount}}</span>
           <span>Ilość</span>
         </div>
 
@@ -33,7 +37,7 @@
 export default {
   data() {
     return {
-      pastureCapacity: 700,
+      pastureCapacity: 5000,
     }
   },
   props: {
@@ -64,7 +68,7 @@ export default {
       var count = 0;
       var i = 0;
       this.troops.forEach(() => {
-        count += this.troops[i].count;
+        count += this.troops[i].amount;
         i++;
       })
       return count;
@@ -99,5 +103,17 @@ export default {
   font-size: 8pt !important;
   margin-bottom: 5px;
   font-family: Sui Generis;
+}
+.level {
+  display: flex;
+  flex-direction: row;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.star {
+  height: 110%;
+  text-align: left;
+  padding-right: 0px;
+  width: 0;
 }
 </style>

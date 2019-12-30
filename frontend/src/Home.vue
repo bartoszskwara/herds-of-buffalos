@@ -20,13 +20,18 @@ import NavigationBar from "./NavigationBar.vue";
 import ResourcesPanel from "./ResourcesPanel.vue";
 import PlayerInfo from "./PlayerInfo.vue";
 import TroopsPanel from "./TroopsPanel.vue";
-import troopsArray from "./assets/troops.js";
 
 export default {
   components: {NavigationBar, ResourcesPanel, PlayerInfo, TroopsPanel},
   data(){
     return {
-      troopsArray: troopsArray,
+      troopsArray: [{
+                        key: String,
+                        label: String,
+                        building: String,
+                        amount: Number,
+                        level: Number
+                      }],
       player: {},
       activeCity: {resources: {}},
     }
@@ -39,8 +44,15 @@ export default {
         this.player = response.data,
         axios
         .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId)
-        .then(response => (this.activeCity = response.data))
-      ))
+        .then(response => (
+          this.activeCity = response.data,
+          axios
+          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/unit")
+          .then(response => (this.troopsArray = response.data.content))
+        ))
+      )).catch((error) => {
+        alert(error.response.data.message);
+      })
   },
 }
 </script>
