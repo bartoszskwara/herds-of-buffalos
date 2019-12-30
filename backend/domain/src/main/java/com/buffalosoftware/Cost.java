@@ -1,11 +1,11 @@
-package com.buffalosoftware.dto.resources;
+package com.buffalosoftware;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@Builder
-public class ResourcesDto {
+@AllArgsConstructor
+public class Cost {
     private Integer wood;
     private Integer clay;
     private Integer iron;

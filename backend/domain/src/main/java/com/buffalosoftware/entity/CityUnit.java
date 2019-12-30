@@ -1,5 +1,6 @@
 package com.buffalosoftware.entity;
 
+import com.buffalosoftware.unit.Unit;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +12,16 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Date;
 
 @Entity
-@Table(schema = "public", name = "city_resource")
-public class CityResources extends BaseEntity {
+@Table(schema = "public", name = "city_unit")
+public class CityUnit extends BaseEntity {
+
+    @Getter
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "unit", nullable = false)
+    private Unit unit;
 
     @Getter
     @Setter
@@ -25,17 +31,11 @@ public class CityResources extends BaseEntity {
 
     @Getter
     @Setter
-    @Column(name = "resource")
-    @Enumerated(EnumType.STRING)
-    private Resource resource;
-
-    @Getter
-    @Setter
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private Integer amount;
 
     @Getter
     @Setter
-    @Column(name = "update_date")
-    private Date updateDate;
+    @Column(name = "level", nullable = false)
+    private Integer level;
 }

@@ -51,7 +51,12 @@ public class City extends BaseEntity {
     @Getter
     @Setter
     @OneToMany(mappedBy = "city")
-    private Set<CityResources> cityResources;
+    private Set<CityResources> cityResources = new HashSet<>();
+
+    @Getter
+    @Setter
+    @OneToMany(mappedBy = "city")
+    private Set<CityUnit> cityUnits = new HashSet<>();
 }
 
 

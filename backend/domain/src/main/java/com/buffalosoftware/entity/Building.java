@@ -1,57 +1,88 @@
 package com.buffalosoftware.entity;
 
+import com.buffalosoftware.Cost;
+import com.buffalosoftware.ICostEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 
 @Getter
 @AllArgsConstructor
-public enum Building {
-    townhall("Town Hall", 30, 500L, 500L, 500L, 1.2),
-    barracks("Barracks", 20, 500L, 600L, 700L, 1.1),
-    armory("Armory", 10, 550L, 400L, 900L, 1.05),
-    granary("Granary", 30, 800L, 800L, 800L, 1.2),
-    brickyard("Brickyard", 25, 200L, 600L, 400L, 1.2),
-    sawmill("Sawmill", 25, 500L, 200L, 400L, 1.2),
-    ironworks("Ironworks", 25, 300L, 400L, 600L, 1.2),
-    pasture("Pasture", 10, 1800L, 1200L, 1000L, 1.25),
-    machineFactory("Machine Factory", 5, 2800L, 2200L, 2500L, 1.85),
-    palace("Palace", 3, 50000L, 50000L, 50000L, 3.0),
-    wall("Wall", 15, 900L, 700L, 300L, 1.3),
-    market("Market", 10, 1000L, 1000L, 800L, 1.6),
-    well("Well", 1, 17000L, 17000L, 17000L, 1.0),
-    fountain("Fountain", 1, 11000L, 11900L, 10500L, 1.0),
-    statue("Statue", 1, 13800L, 12500L, 16600L, 1.0);
-
-    private static final List<Building> allAvailableBuildings;
-
-    static {
-        allAvailableBuildings = asList(Building.values());
-    }
+public enum Building implements ICostEntity {
+    townhall("Town Hall", 30, 1.2),
+    barracks("Barracks", 20, 1.1),
+    armory("Armory", 10, 1.05),
+    granary("Granary", 30, 1.2),
+    brickyard("Brickyard", 25, 1.2),
+    sawmill("Sawmill", 25, 1.2),
+    ironworks("Ironworks", 25, 1.2),
+    pasture("Pasture", 10, 1.25),
+    machineFactory("Machine Factory", 5, 1.85),
+    palace("Palace", 3, 3.0),
+    wall("Wall", 15, 1.3),
+    market("Market", 10, 1.6),
+    well("Well", 1, 1.0),
+    fountain("Fountain", 1, 1.0),
+    statue("Statue", 1, 1.0),
+    shipyard("Shipyard", 5, 1.5);
 
     private String name;
     private Integer maxLevel;
-    private Long firstLevelWoodCost;
-    private Long firstLevelClayCost;
-    private Long firstLevelIronCost;
     private Double nextLevelCostFactor;
+
+    private static final List<Building> allAvailableBuildings;
+    private static final Map<Building, Cost> buildingFirstLevelCost;
+    private static final Map<String, Building> buildingsByKey;
+
+    static {
+        allAvailableBuildings = asList(values());
+
+        buildingFirstLevelCost = new HashMap<>();
+        buildingFirstLevelCost.put(townhall, new Cost(500, 500, 500));
+        buildingFirstLevelCost.put(barracks, new Cost(500, 600, 700));
+        buildingFirstLevelCost.put(armory, new Cost(550, 400, 900));
+        buildingFirstLevelCost.put(granary, new Cost(800, 800, 800));
+        buildingFirstLevelCost.put(brickyard, new Cost(200, 600, 400));
+        buildingFirstLevelCost.put(sawmill, new Cost(500, 200, 400));
+        buildingFirstLevelCost.put(ironworks, new Cost(300, 400, 600));
+        buildingFirstLevelCost.put(pasture, new Cost(1800, 1200, 1000));
+        buildingFirstLevelCost.put(machineFactory, new Cost(2800, 2200, 2500));
+        buildingFirstLevelCost.put(palace, new Cost(50000, 50000, 50000));
+        buildingFirstLevelCost.put(wall, new Cost(900, 700, 300));
+        buildingFirstLevelCost.put(market, new Cost(1000, 1000, 800));
+        buildingFirstLevelCost.put(well, new Cost(17000, 17000, 17000));
+        buildingFirstLevelCost.put(fountain, new Cost(11000, 11900, 10500));
+        buildingFirstLevelCost.put(statue, new Cost(13800, 12500, 16600));
+        buildingFirstLevelCost.put(shipyard, new Cost(10000, 10000, 10000));
+
+        buildingsByKey = allAvailableBuildings.stream().collect(Collectors.toMap(Enum::name, Function.identity()));
+    }
 
     public static List<Building> list() {
         return allAvailableBuildings;
     }
 
-    public Long getWoodCostForLevel(Integer nextLevel) {
-        return Math.round(firstLevelWoodCost * Math.pow(nextLevelCostFactor, nextLevel - 1));
+    @Override
+    public Cost getUpgradingCostForLevel(Integer level) {
+        Integer woodCost = Math.round(getFirstLevelCost(this).getWood() * (float) Math.pow(nextLevelCostFactor, level - 1));
+        Integer clayCost = Math.round(getFirstLevelCost(this).getClay() * (float) Math.pow(nextLevelCostFactor, level - 1));
+        Integer ironCost = Math.round(getFirstLevelCost(this).getIron() * (float) Math.pow(nextLevelCostFactor, level - 1));
+        return new Cost(woodCost, clayCost, ironCost);
     }
 
-    public Long getClayCostForLevel(Integer nextLevel) {
-        return Math.round(firstLevelClayCost * Math.pow(nextLevelCostFactor, nextLevel - 1));
+    private static Cost getFirstLevelCost(Building building) {
+        return buildingFirstLevelCost.get(building);
     }
 
-    public Long getIronCostForLevel(Integer nextLevel) {
-        return Math.round(firstLevelIronCost * Math.pow(nextLevelCostFactor, nextLevel - 1));
+    public static Optional<Building> getByKey(String key) {
+        return Optional.ofNullable(buildingsByKey.get(key));
     }
 }

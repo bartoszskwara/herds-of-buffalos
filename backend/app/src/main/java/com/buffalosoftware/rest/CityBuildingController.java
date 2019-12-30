@@ -2,6 +2,7 @@ package com.buffalosoftware.rest;
 
 import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.dto.building.BaseDtoList;
+import com.buffalosoftware.entity.Building;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,5 +29,13 @@ public class CityBuildingController {
     public ResponseEntity getUpgradePossibilities(@NotNull @PathVariable("userId") Long userId,
                                                   @NotNull @PathVariable("cityId") Long cityId) {
         return ResponseEntity.ok(new BaseDtoList<>(buildingService.getUpgradePossibilities(userId, cityId)));
+    }
+
+    @GetMapping("/{buildingKey}/unit")
+    public ResponseEntity getAvailableUnits(@NotNull @PathVariable("userId") Long userId,
+                                            @NotNull @PathVariable("cityId") Long cityId,
+                                            @NotNull @PathVariable("buildingKey") String buildingKey) {
+        Building building = Building.getByKey(buildingKey).orElseThrow(() -> new IllegalArgumentException("Building doesn't exist!"));
+        return ResponseEntity.ok(new BaseDtoList<>(buildingService.getAvailableUnits(userId, cityId, building)));
     }
 }

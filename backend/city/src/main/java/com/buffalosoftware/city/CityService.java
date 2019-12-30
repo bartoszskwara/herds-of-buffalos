@@ -50,12 +50,12 @@ public class CityService implements ICityService {
                 .build();
     }
 
-    private Long getResourceAmount(Set<CityResources> cityResources, Resource resource) {
+    private Integer getResourceAmount(Set<CityResources> cityResources, Resource resource) {
         Optional<CityResources> resourceData = cityResources.stream().filter(r -> resource.equals(r.getResource())).findFirst();
         if(resourceData.isPresent()) {
             return resourceData.get().getAmount();
         }
-        return 0L;
+        return 0;
     }
 
 }
