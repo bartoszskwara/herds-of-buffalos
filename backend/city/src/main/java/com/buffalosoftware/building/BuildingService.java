@@ -1,24 +1,17 @@
 package com.buffalosoftware.building;
 
-import com.buffalosoftware.Cost;
 import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.dto.building.BuildingDto;
 import com.buffalosoftware.dto.building.BuildingNextLevelDto;
 import com.buffalosoftware.dto.building.CityBuildingDto;
-import com.buffalosoftware.dto.building.CityUnitDto;
-import com.buffalosoftware.dto.building.UnitRecruitmentDto;
-import com.buffalosoftware.dto.building.UnitRecruitmentDto.UnitLevelDataDto;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
-import com.buffalosoftware.entity.CityBuildingUnitLevel;
 import com.buffalosoftware.entity.CityResources;
-import com.buffalosoftware.entity.CityUnit;
 import com.buffalosoftware.entity.Resource;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.repository.UserRepository;
-import com.buffalosoftware.unit.Unit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,17 +21,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.buffalosoftware.entity.Resource.clay;
 import static com.buffalosoftware.entity.Resource.iron;
 import static com.buffalosoftware.entity.Resource.wood;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 @Service
 @RequiredArgsConstructor
@@ -95,73 +84,6 @@ public class BuildingService implements IBuildingService {
                 .collect(toList());
     }
 
-    @Override
-    public List<UnitRecruitmentDto> getAvailableUnits(Long userId, Long cityId, Building building) {
-        User user = userRepository.findUserWithCitiesAndBuildingsAndUnitLevelsById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
-        City city = user.getCities().stream()
-                .filter(c -> c.getId().equals(cityId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("City doesn't exist!"));
-        Map<Unit, List<Integer>> unitLevelsInBuilding = city.getCityBuildings().stream()
-                .filter(b -> building.equals(b.getBuilding()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Building doesn't exist in the city!"))
-                .getUnitLevels().stream()
-                .collect(groupingBy(CityBuildingUnitLevel::getUnit, mapping(CityBuildingUnitLevel::getAvailableLevel, toList())));
-        return Unit.getUnitsByBuilding(building).stream()
-                .sorted(Comparator.comparing(Unit::getOrderInBuilding))
-                .map(unit -> UnitRecruitmentDto.builder()
-                        .unit(CityUnitDto.builder()
-                                .key(unit.name())
-                                .label(unit.getName())
-                                .building(building.name())
-                                .build())
-                        .maxLevel(unit.getMaxLevel())
-                        .levelsData(createUnitLevelsDataList(unit, unitLevelsInBuilding.get(unit), city))
-                        .build())
-                .collect(toList());
-    }
-
-    private List<UnitLevelDataDto> createUnitLevelsDataList(Unit unit, List<Integer> availableLevels, City city) {
-        return IntStream.rangeClosed(1, unit.getMaxLevel()).boxed()
-                .map(level -> {
-                    Cost recruitmentCostForLevel = unit.getRecruitmentCostForLevel(level);
-
-                    boolean levelEnabled = isNotEmpty(availableLevels) && availableLevels.contains(level);
-                    boolean nextLevelEnabled = isNotEmpty(availableLevels) && availableLevels.contains(level + 1);
-
-                    UnitLevelDataDto.UnitLevelDataDtoBuilder unitLevelDataDto = UnitLevelDataDto.builder()
-                            .level(level)
-                            .enabled(levelEnabled)
-                            .amountInCity(city.getCityUnits().stream()
-                                    .filter(u -> unit.equals(u.getUnit()) && level.equals(u.getLevel()))
-                                    .findFirst()
-                                    .map(CityUnit::getAmount)
-                                    .orElse(0))
-                            .skills(unit.getSkillsForLevel(level))
-                            .recruitmentCost(ResourcesDto.builder()
-                                    .wood(recruitmentCostForLevel.getWood())
-                                    .clay(recruitmentCostForLevel.getClay())
-                                    .iron(recruitmentCostForLevel.getIron())
-                                    .build());
-
-                    if(levelEnabled && !nextLevelEnabled && !unit.getMaxLevel().equals(level) ) {
-                        Cost upgradingCostForLevel = unit.getUpgradingCostForLevel(level + 1);
-                        ResourcesDto upgradingResources = ResourcesDto.builder()
-                                .wood(upgradingCostForLevel.getWood())
-                                .clay(upgradingCostForLevel.getClay())
-                                .iron(upgradingCostForLevel.getIron())
-                                .build();
-                        unitLevelDataDto
-                                .upgradingCost(upgradingResources)
-                                .upgradeRequirementsMet(areRequirementsMet(city, upgradingResources));
-                    }
-                    return unitLevelDataDto.build();
-                })
-                .collect(toList());
-    }
-
     private BuildingNextLevelDto createBuildingNextLevelDto(Building building, City city, Integer currentBuildingLevel) {
         BuildingNextLevelDto.BuildingNextLevelDtoBuilder buildingNextLevelDto = BuildingNextLevelDto.builder()
                 .building(BuildingDto.builder()
@@ -200,11 +122,6 @@ public class BuildingService implements IBuildingService {
     private Integer getNextLevelOfBuilding(Integer currentBuildingLevel, Integer buildingMaxLevel) {
         Integer nextLevel = currentBuildingLevel != null ? currentBuildingLevel + 1 : 1;
         return nextLevel <= buildingMaxLevel ? nextLevel : null;
-    }
-
-    private Integer getNextLevelOfUnit(Integer currentLevel, Integer maxLevel) {
-        Integer nextLevel = currentLevel != null ? currentLevel + 1 : 1;
-        return nextLevel <= maxLevel ? nextLevel : null;
     }
 
     private Integer getAmountOf(Resource resource, Set<CityResources> resources) {

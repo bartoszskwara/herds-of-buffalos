@@ -23,4 +23,10 @@ public class CityUnitController {
                                           @NotNull @PathVariable("cityId") Long cityId) {
         return ResponseEntity.ok(new BaseDtoList<>(unitService.getUnitsInCity(userId, cityId)));
     }
+
+    @GetMapping("/upgrade")
+    public ResponseEntity getUnitUpgradePossibilities(@NotNull @PathVariable("userId") Long userId,
+                                                      @NotNull @PathVariable("cityId") Long cityId) {
+        return ResponseEntity.ok(new BaseDtoList<>(unitService.getUpgradePossibilities(userId, cityId)));
+    }
 }

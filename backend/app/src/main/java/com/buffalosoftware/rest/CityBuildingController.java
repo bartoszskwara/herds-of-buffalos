@@ -1,6 +1,7 @@
 package com.buffalosoftware.rest;
 
 import com.buffalosoftware.api.city.IBuildingService;
+import com.buffalosoftware.api.unit.IUnitService;
 import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.entity.Building;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import javax.validation.constraints.NotNull;
 public class CityBuildingController {
 
     private final IBuildingService buildingService;
+    private final IUnitService unitService;
 
     @GetMapping("")
     public ResponseEntity getAllCityBuildings(@NotNull @PathVariable("userId") Long userId,
@@ -36,6 +38,6 @@ public class CityBuildingController {
                                             @NotNull @PathVariable("cityId") Long cityId,
                                             @NotNull @PathVariable("buildingKey") String buildingKey) {
         Building building = Building.getByKey(buildingKey).orElseThrow(() -> new IllegalArgumentException("Building doesn't exist!"));
-        return ResponseEntity.ok(new BaseDtoList<>(buildingService.getAvailableUnits(userId, cityId, building)));
+        return ResponseEntity.ok(new BaseDtoList<>(unitService.getAvailableUnits(userId, cityId, building)));
     }
 }
