@@ -1,7 +1,7 @@
 <template>
   <div id="barracks">
     <h1>Koszary</h1>
-    <div v-if="availableTroops !=null && isAnyTroopAvailable()">
+    <div v-if="availableTroops !=null && isAnyTroopAvailable() == true">
       <md-list class="md-double-line troop" :key="troop.unit.label" v-for="troop in availableTroops">
         <troop-recruit v-if="troop.levelsData[0].enabled == true" :troop="troop" :resources="activeCity.resources"></troop-recruit>
       </md-list>
@@ -53,13 +53,12 @@ export default {
   },
   methods: {
     isAnyTroopAvailable(){
-      var i = 0;
-      this.availableTroops.forEach(() => {
-        if(this.availableTroops[i].enabled == true){
+      var len = this.availableTroops.length;
+      for(var i = 0 ; i < len ; i++){
+        if(this.availableTroops[i].levelsData[0].enabled == true){
           return true;
         }
-        i++;
-      });
+      }
       return false;
     }
   },

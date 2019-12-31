@@ -53,13 +53,12 @@ export default {
   },
   methods: {
     isAnyTroopAvailable(){
-      var i = 0;
-      this.availableTroops.forEach(() => {
-        if(this.availableTroops[i].enabled == true){
+      var len = this.availableTroops.length;
+      for(var i = 0 ; i < len ; i++){
+        if(this.availableTroops[i].levelsData[0].enabled == true){
           return true;
         }
-        i++;
-      });
+      }
       return false;
     }
   },
