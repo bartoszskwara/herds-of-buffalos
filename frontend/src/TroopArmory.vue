@@ -7,7 +7,6 @@
     <md-list-item>
       <div class="md-list-item-text level" style="flex-grow: 1">
         <md-icon class="star" :md-src="require('./assets/star.svg')" />
-        <md-icon class="star" :md-src="require('./assets/star.svg')" />
 
       </div>
       <div class="md-list-item-text" style="flex-grow: 0.7">
@@ -19,11 +18,7 @@
         <span class="textLabel">{{troop.attr.defense}}</span>
       </div>
       <div class="md-list-item-text" style="flex-grow: 0.7">
-        <span><md-icon class="mat strength" :md-src="require('./assets/defense.svg')" /></span>
-        <span class="textLabel">{{troop.attr.defense}}</span>
-      </div>
-      <div class="md-list-item-text" style="flex-grow: 0.7">
-        <span><md-icon class="mat strength" :md-src="require('./assets/defense.svg')" /></span>
+        <span><md-icon class="mat strength" :md-src="require('./assets/health.svg')" /></span>
         <span class="textLabel">{{troop.attr.defense}}</span>
       </div>
       <div class="md-list-item-text surowce" style="flex-grow: 2">

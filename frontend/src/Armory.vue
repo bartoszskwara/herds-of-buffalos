@@ -2,7 +2,7 @@
   <div id="barracks">
       <h1>Zbrojownia</h1>
     <md-list class="md-double-line troop" :key="troop.name" v-for="troop in troopsArray">
-      <troop-armory v-bind:troop="troop"></troop-armory>
+      <troop-armory :troop="troop"></troop-armory>
     </md-list>
   </div>
 </template>
@@ -20,7 +20,27 @@ export default {
     }
   },
   methods: {
-  }
+  },
+  // mounted: function(){
+  //   const axios = require('axios').default;
+  //
+  //   axios
+  //     .get("http://localhost:8088/user/current")
+  //     .then(response => (
+  //       this.player = response.data,
+  //       axios
+  //       .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId)
+  //       .then(response => (
+  //         this.activeCity = response.data
+  //       )),
+  //       axios
+  //         .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/barracks/unit")
+  //         .then(response => (this.availableTroops = response.data.content))
+  //       )).catch((error) => {
+  //         this.availableTroops = null;
+  //         alert(error.response.data.message);
+  //       })
+  // }
 
 }
 </script>

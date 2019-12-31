@@ -1,13 +1,13 @@
 <template>
   <div id="building">
-
     <md-toolbar :md-elevation="1" @click.native='setRoute(building.building.key)'>
       <span class="md-title">{{building.building.label}}</span>
     </md-toolbar>
+    <div v-if="building.building.maxLevel != building.currentLevel">
       <md-list-item>
         <md-icon :md-src="require('./assets/bricks.svg')" />
         <div class="md-list-item-text level">
-          <span>{{building.nextLevel - 1}}</span>
+          <span>{{building.currentLevel}}</span>
           <span>Poziom</span>
         </div>
       </md-list-item>
@@ -30,7 +30,10 @@
           <span>{{building.cost.iron}}</span>
         </div>
       </md-list-item>
-
+    </div>
+    <div v-else>
+      <p class="maxLevel">Budynek na najwyższym poziomie.</p>
+    </div>
   </div>
 </template>
 
@@ -77,5 +80,9 @@ export default {
   }
   .md-list-item-text.level {
     margin-right: 60%;
+  }
+  p.maxLevel {
+    text-align: center;
+    margin-top: 20px;
   }
 </style>

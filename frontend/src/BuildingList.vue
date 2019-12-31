@@ -1,14 +1,20 @@
 <template>
   <div id="buildings">
-    <md-list class="md-double-line" :key="building.building.key" v-for="building in buildingsArray">
-      <building :building="building"></building>
-
-      <md-list-item>
-        <div class="md-list-item-text">
-          <md-button class="md-raised md-primary" @click="upgrade(building)">Rozbuduj</md-button>
-        </div>
-      </md-list-item>
-    </md-list>
+    <div :key="building.building.key" v-for="building in buildingsArray">
+      <md-list class="md-double-line" v-if="building.building.maxLevel != building.currentLevel">
+        <building :building="building"></building>
+        <md-list-item>
+          <div class="md-list-item-text">
+            <md-button class="md-raised md-primary" @click="upgrade(building)">Rozbuduj</md-button>
+          </div>
+        </md-list-item>
+      </md-list>
+    </div>
+    <div :key="building.building.key" v-for="building in buildingsArray">
+      <md-list class="md-double-line" v-if="building.building.maxLevel == building.currentLevel">
+        <building :building="building"></building>
+      </md-list>
+    </div>
 
     <md-dialog-alert
       :md-active.sync="alertMaxLevel"
@@ -72,7 +78,7 @@ export default {
         }
       }
       else {
-        this.alertText = "Ten budynek został już rozbudowany do najwyższego poziomu!";
+        this.alertText = "Ten budynek został już rozbudowany do najwyższego poziomu!"+building.building.label;
         this.alertMaxLevel = true;
       }
     }

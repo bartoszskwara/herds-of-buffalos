@@ -4,7 +4,7 @@
     <div class="mapView">
       <div class="wioska" v-bind:key="village.name" v-for="village in allCities"
         v-bind:style="stylePositionVillage(village)" @click="villageClicked(village)">
-        <div class="activeCity" v-if="village.user.id == 1"></div>
+        <div class="activeCity" v-if="village.user.id == player.id"></div>
         <img :src="setVillageImage(village)" />
         <md-tooltip md-direction="top"><b>Gracz:</b>  {{village.user.name}}
         <br><b>Wioska:</b>  {{village.name}}
@@ -34,6 +34,7 @@ import mapVillages from "./assets/mapVillages.js";
 export default {
   data() {
     return {
+      player: {},
       mapVillages: mapVillages,
       squareSizeX: 45,
       squareSizeY: 40,
@@ -50,7 +51,10 @@ export default {
   mounted: function(){
     const axios = require('axios').default;
     var i = 0;
-
+    axios
+    .get("http://localhost:8088/user/current")
+    .then(response => (
+      this.player = response.data,
     axios
     .get('http://localhost:8088/user')
     .then(response => (
@@ -65,7 +69,7 @@ export default {
           }
         )))
         i++;
-      }) ));
+      }) )) ));
     },
     methods: {
       stylePositionVillage(village) {

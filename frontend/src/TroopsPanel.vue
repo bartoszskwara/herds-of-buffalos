@@ -10,15 +10,15 @@
         </div>
       </md-list-item>
 
-      <md-list-item :key="troop.key" v-for="troop in troops">
-        <div class="md-list-item-text" style="flex-grow: 1">
+      <md-list-item :class="checkFirstClass(troop)" :key="troop.key+troop.level" v-for="troop in troops">
+        <div class="md-list-item-text" style="flex-grow: 0.5">
           <md-icon>face</md-icon>
         </div>
         <div class="md-list-item-text" style="flex-grow: 2">
           <span>{{troop.label}}</span>
           <span>Rodzaj</span>
         </div>
-        <div class="md-list-item-text level" style="flex-grow: 1.5">
+        <div class="md-list-item-text level" style="flex-grow: 2">
           <md-icon class="star" :md-src="require('./assets/star.svg')" v-bind:key="n" v-for="n in troop.level">{{n}}</md-icon>
         </div>
         <div class="md-list-item-text" style="flex-grow: 1">
@@ -37,7 +37,7 @@
 export default {
   data() {
     return {
-      pastureCapacity: 5000,
+      pastureCapacity: 13000,
     }
   },
   props: {
@@ -54,6 +54,14 @@ export default {
         style = {color: 'black'};
       }
       return style;
+    },
+    checkFirstClass(troop){
+      if(troop.level == 1){
+        return "first";
+      }
+      else {
+        return "";
+      }
     }
   },
   computed: {
@@ -84,8 +92,14 @@ export default {
 .md-list {
   margin-left: 0 !important;
 }
-.md-list-item-text span {
+.md-list-item span {
   text-align: center !important;
+}
+.md-list-item.first {
+  border-top: 1px solid #d6d6d6;
+}
+.md-icon {
+  width: 0;
 }
 .nick {
   padding-right: 35%;

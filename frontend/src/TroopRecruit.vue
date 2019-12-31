@@ -25,10 +25,6 @@
           <span><md-icon class="mat" :md-src="require('./assets/health.svg')" /></span>
           <span class="textLabel">{{unitKind.skills.health}}</span>
         </div>
-        <div class="md-list-item-text" style="flex-grow: 1">
-          <span><md-icon class="mat" :md-src="require('./assets/defense.svg')" /></span>
-          <span class="textLabel">{{unitKind.skills.defense}}</span>
-        </div>
 
         <div class="md-list-item-text divider">
           <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
