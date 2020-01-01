@@ -13,7 +13,7 @@ public class UnitLevelDataDto extends BaseDto {
     private Integer amountInCity;
     private UnitSkills skills;
     private ResourcesDto recruitmentCost;
-    private boolean enabled;
+    private Boolean enabled;
     private ResourcesDto upgradingCost;
     private Boolean upgradeRequirementsMet;
 }

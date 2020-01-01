@@ -42,19 +42,27 @@ public class UnitService implements IUnitService {
     private final UserRepository userRepository;
 
     @Override
-    public List<CityUnitDto> getUnitsInCity(Long userId, Long cityId) {
+    public List<UnitWithLevelsDto> getUnitsInCity(Long userId, Long cityId) {
         User user = userRepository.findUserWithCitiesAndCityUnitsById(userId).orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
-        return user.getCities().stream()
+        Map<Unit, List<CityUnit>> unitsInCity = user.getCities().stream()
                 .filter(city -> city.getId().equals(cityId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("City doesn't exist!"))
-                .getCityUnits().stream()
-                .map(units -> CityUnitDto.builder()
-                        .key(units.getUnit().name())
-                        .label(units.getUnit().getName())
-                        .level(units.getLevel())
-                        .amount(units.getAmount())
-                        .building(Unit.getBuildingByUnit(units.getUnit()).map(Enum::name).orElse(null))
+                .getCityUnits().stream().collect(groupingBy(CityUnit::getUnit));
+        return unitsInCity.entrySet().stream()
+                .map(entry -> UnitWithLevelsDto.builder()
+                        .unit(CityUnitDto.builder()
+                                .key(entry.getKey().name())
+                                .label(entry.getKey().getName())
+                                .building(Unit.getBuildingByUnit(entry.getKey()).map(Enum::name).orElse(null))
+                                .build())
+                        .levelsData(entry.getValue().stream()
+                                .map(cityUnit -> UnitLevelDataDto.builder()
+                                        .level(cityUnit.getLevel())
+                                        .amountInCity(cityUnit.getAmount())
+                                        .build())
+                                .sorted(Comparator.comparing(UnitLevelDataDto::getLevel))
+                                .collect(toList()))
                         .build())
                 .collect(toList());
     }
