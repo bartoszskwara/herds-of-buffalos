@@ -27,8 +27,6 @@ import java.util.stream.IntStream;
 import static com.buffalosoftware.entity.Resource.clay;
 import static com.buffalosoftware.entity.Resource.iron;
 import static com.buffalosoftware.entity.Resource.wood;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
@@ -75,34 +73,21 @@ public class UnitService implements IUnitService {
                 .filter(c -> c.getId().equals(cityId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("City doesn't exist!"));
-
         Map<Unit, List<Integer>> availableUnitLevels = city.getCityBuildings().stream()
                 .flatMap(cb -> cb.getUnitLevels().stream())
                 .collect(groupingBy(CityBuildingUnitLevel::getUnit, mapping(CityBuildingUnitLevel::getAvailableLevel, toList())));
 
         return Unit.list().stream()
                 .sorted(Comparator.comparing( u -> ((Unit) u).getBuilding().ordinal()).thenComparing(u -> ((Unit) u).getOrderInBuilding()))
-                .map(unit -> {
-                    boolean enabled = ofNullable(availableUnitLevels.get(unit)).orElse(emptyList()).contains(1);
-                    UnitUpgradeDto.UnitUpgradeDtoBuilder unitUpgradeDto = UnitUpgradeDto.builder()
-                            .unit(CityUnitDto.builder()
-                                    .key(unit.name())
-                                    .label(unit.getName())
-                                    .building(Unit.getBuildingByUnit(unit).map(Building::getName).orElse(null))
-                                    .build())
-                            .maxLevel(unit.getMaxLevel())
-                            .firstLevelSkills(unit.getSkillsForLevel(1))
-                            .firstLevelRecruitmentCost(mapCost(unit.getRecruitmentCostForLevel(1)))
-                            .enabled(enabled);
-
-                    if(!enabled) {
-                        ResourcesDto upgradingResources = mapCost(unit.getUpgradingCostForLevel(1));
-                        unitUpgradeDto
-                                .upgradingCost(upgradingResources)
-                                .upgradeRequirementsMet(areRequirementsMet(city, upgradingResources));
-                    }
-                    return unitUpgradeDto.build();
-                })
+                .map(unit -> UnitUpgradeDto.builder()
+                        .unit(CityUnitDto.builder()
+                                .key(unit.name())
+                                .label(unit.getName())
+                                .building(Unit.getBuildingByUnit(unit).map(Building::name).orElse(null))
+                                .build())
+                        .maxLevel(unit.getMaxLevel())
+                        .levelsData(createUnitLevelsDataList(unit, availableUnitLevels.get(unit), city))
+                        .build())
                 .collect(toList());
     }
 
@@ -138,10 +123,14 @@ public class UnitService implements IUnitService {
         return IntStream.rangeClosed(1, unit.getMaxLevel()).boxed()
                 .map(level -> {
                     Cost recruitmentCostForLevel = unit.getRecruitmentCostForLevel(level);
+                    Cost upgradingCostForLevel = unit.getUpgradingCostForLevel(level + 1);
+                    ResourcesDto upgradingResources = ResourcesDto.builder()
+                            .wood(upgradingCostForLevel.getWood())
+                            .clay(upgradingCostForLevel.getClay())
+                            .iron(upgradingCostForLevel.getIron())
+                            .build();
 
                     boolean levelEnabled = isNotEmpty(availableLevels) && availableLevels.contains(level);
-                    boolean nextLevelEnabled = isNotEmpty(availableLevels) && availableLevels.contains(level + 1);
-
                     UnitLevelDataDto.UnitLevelDataDtoBuilder unitLevelDataDto = UnitLevelDataDto.builder()
                             .level(level)
                             .enabled(levelEnabled)
@@ -155,29 +144,21 @@ public class UnitService implements IUnitService {
                                     .wood(recruitmentCostForLevel.getWood())
                                     .clay(recruitmentCostForLevel.getClay())
                                     .iron(recruitmentCostForLevel.getIron())
-                                    .build());
-
-                    if(levelEnabled && !nextLevelEnabled && !unit.getMaxLevel().equals(level) ) {
-                        Cost upgradingCostForLevel = unit.getUpgradingCostForLevel(level + 1);
-                        ResourcesDto upgradingResources = ResourcesDto.builder()
-                                .wood(upgradingCostForLevel.getWood())
-                                .clay(upgradingCostForLevel.getClay())
-                                .iron(upgradingCostForLevel.getIron())
-                                .build();
-                        unitLevelDataDto
-                                .upgradingCost(upgradingResources)
-                                .upgradeRequirementsMet(areRequirementsMet(city, upgradingResources));
-                    }
+                                    .build())
+                            .upgradingCost(upgradingResources)
+                            .upgradeRequirementsMet(areUpgradeRequirementsMet(city, upgradingResources, level, levelEnabled, availableLevels));
                     return unitLevelDataDto.build();
                 })
                 .sorted(Comparator.comparing(UnitLevelDataDto::getLevel))
                 .collect(toList());
     }
 
-    private boolean areRequirementsMet(City city, ResourcesDto resourcesCost) {
+    private boolean areUpgradeRequirementsMet(City city, ResourcesDto resourcesCost, Integer level, boolean levelEnabled, List<Integer> availableLevels) {
         Set<CityResources> cityResources = city.getCityResources();
+        boolean prevLevelEnabled = isNotEmpty(availableLevels) && availableLevels.contains(level - 1);
         //TODO add checking buildings requirements
-        return areResourceRequirementsMet(cityResources, resourcesCost);
+        return areResourceRequirementsMet(cityResources, resourcesCost) &&
+                ((level.equals(1) && !levelEnabled) || (!levelEnabled && prevLevelEnabled));
     }
 
     private boolean areResourceRequirementsMet(Set<CityResources> cityResources, ResourcesDto resourcesCost) {
