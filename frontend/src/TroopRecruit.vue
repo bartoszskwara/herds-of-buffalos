@@ -6,7 +6,7 @@
     <div v-bind:key="unitKind.level" v-for="unitKind in troop.levelsData">
       <md-list-item v-if="unitKind.enabled == true">
         <div class="md-list-item-text level" style="flex-grow: 1">
-          <md-icon class="star" :md-src="require('./assets/star.svg')" v-bind:key="n" v-for="n in unitKind.level"/>
+          <md-icon class="chevron" :md-src="require('./assets/chevron'+unitKind.level+'.svg')"></md-icon>
         </div>
 
         <div class="md-list-item-text" style="flex-grow: 2">
@@ -149,7 +149,7 @@ export default {
   padding-top: 5px;
 }
 .md-icon {
-  width: 0 !important;
+  width: 0;
   min-height: 110%;
 }
 .mat {
@@ -169,13 +169,11 @@ export default {
   width: 0px;
 }
 .level {
-  display: flex;
-  flex-direction: row;
-  padding-right: 30px;
+  padding-left: 20px;
 }
-.star {
+.chevron {
   height: 110%;
-  text-align: left;
-  padding-right: 0px;
+  text-align: center;
+  width: 40px;
 }
 </style>

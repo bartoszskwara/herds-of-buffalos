@@ -29,13 +29,11 @@
 </template>
 
 <script>
-import mapVillages from "./assets/mapVillages.js";
 
 export default {
   data() {
     return {
       player: {},
-      mapVillages: mapVillages,
       squareSizeX: 45,
       squareSizeY: 40,
       imagePath: String,
