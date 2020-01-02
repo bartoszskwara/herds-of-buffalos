@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
     <navigation-bar></navigation-bar>
     <div class="container">
       <div class="leftPanel">
@@ -25,13 +24,19 @@ export default {
   components: {NavigationBar, ResourcesPanel, PlayerInfo, TroopsPanel},
   data(){
     return {
-      troopsArray: [{
-                        key: String,
-                        label: String,
-                        building: String,
-                        amount: Number,
-                        level: Number
-                      }],
+      troopsArray: [
+        {
+          unit: {
+                key: String,
+                label: String,
+                building: String
+              },
+          levelsData: [
+            {
+              level: Number,
+              amountInCity: Number
+            },
+          ]}],
       player: {},
       activeCity: {resources: {}},
     }

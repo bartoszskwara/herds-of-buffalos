@@ -2,7 +2,7 @@
   <div id="player">
     <md-list class="md-double-line md-dense">
       <md-subheader>Jednostki</md-subheader>
-      <md-list-item>
+      <md-list-item style="padding-bottom: 20px">
         <div class="md-list-item-text">
           <span v-bind:style="setPastureStyle()" class="progressValue">{{allTroops}} / {{pastureCapacity}}</span>
           <span><md-progress-bar class="md-accent progressBar" md-mode="determinate" :md-value="progressCapacity"></md-progress-bar></span>
@@ -10,24 +10,24 @@
         </div>
       </md-list-item>
 
-      <md-list-item :class="checkFirstClass(troop)" :key="troop.key+troop.level" v-for="troop in troops">
-        <div class="md-list-item-text" style="flex-grow: 0.5">
-          <md-icon>face</md-icon>
-        </div>
-        <div class="md-list-item-text" style="flex-grow: 2">
-          <span>{{troop.label}}</span>
-          <span>Rodzaj</span>
-        </div>
-        <div class="md-list-item-text level" style="flex-grow: 2">
-          <md-icon class="star" :md-src="require('./assets/star.svg')" v-bind:key="n" v-for="n in troop.level">{{n}}</md-icon>
-        </div>
-        <div class="md-list-item-text" style="flex-grow: 1">
-          <span>{{troop.amount}}</span>
-          <span>Ilość</span>
-        </div>
+      <md-list class="md-double-line md-dense" :key="troop.key" v-for="troop in troops">
+        <md-subheader class="first">{{troop.unit.label}}</md-subheader>
+        <md-list-item :key="troopKind.level" v-for="troopKind in troop.levelsData">
 
-      </md-list-item>
+          <div class="md-list-item-text unitSymbol" style="flex-grow: 1">
+            <md-icon>face</md-icon>
+          </div>
+          <div class="md-list-item-text level" style="flex-grow: 2" v-if="isNaN(troopKind.level) == false">
+            <md-icon class="chevron" :md-src="require('./assets/chevron'+troopKind.level+'.svg')"></md-icon>
 
+          </div>
+          <div class="md-list-item-text" style="flex-grow: 2">
+            <span>{{troopKind.amountInCity}}</span>
+            <span>Ilość</span>
+          </div>
+
+        </md-list-item>
+      </md-list>
     </md-list>
   </div>
 </template>
@@ -41,7 +41,7 @@ export default {
     }
   },
   props: {
-    troops: Array
+    troops: Array,
   },
   methods: {
     setPastureStyle(){
@@ -55,28 +55,18 @@ export default {
       }
       return style;
     },
-    checkFirstClass(troop){
-      if(troop.level == 1){
-        return "first";
-      }
-      else {
-        return "";
-      }
-    }
   },
   computed: {
-    nonzeroTroops: function() {
-      return this.troops.filter(function(u) {
-        if(u.count > 0){
-          return u;
-        }
-      })
-    },
     allTroops: function () {
       var count = 0;
       var i = 0;
       this.troops.forEach(() => {
-        count += this.troops[i].amount;
+        var j = 0;
+        var lvls = this.troops[i].levelsData;
+        lvls.forEach(() => {
+          count += lvls[j].amountInCity;
+          j++;
+        })
         i++;
       })
       return count;
@@ -95,11 +85,11 @@ export default {
 .md-list-item span {
   text-align: center !important;
 }
-.md-list-item.first {
+.first {
   border-top: 1px solid #d6d6d6;
 }
 .md-icon {
-  width: 0;
+  width: 0px;
 }
 .nick {
   padding-right: 35%;
@@ -124,10 +114,14 @@ export default {
   padding-right: 10px;
   padding-left: 10px;
 }
-.star {
+.chevron {
   height: 110%;
-  text-align: left;
+  text-align: center;
   padding-right: 0px;
-  width: 0;
+  width: 40px;
+}
+.unitSymbol {
+  text-align: center;
+  padding-left: 30px;
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <div id="shipyard">
     <h1>Stocznia</h1>
-    <div v-if="availableTroops !=null && isAnyTroopAvailable()">
+    <div v-if="availableTroops !=null && isTroopAvailable">
       <md-list class="md-double-line troop" :key="troop.unit.label" v-for="troop in availableTroops">
         <troop-recruit v-if="troop.levelsData[0].enabled == true" :troop="troop" :resources="activeCity.resources"></troop-recruit>
       </md-list>
     </div>
-    <div v-if="!isAnyTroopAvailable()">
+    <div v-else>
       <p class="info">Aby rekrutować jednostki w tym budynku, zbadaj je najpierw w zbrojowni!</p>
     </div>
   </div>
@@ -21,6 +21,7 @@ export default {
     return {
       alertMaxLevel: false,
       player: {},
+      isTroopAvailable: true,
       activeCity: {},
       availableTroops: [
                           {
@@ -74,7 +75,10 @@ export default {
         )),
         axios
           .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/shipyard/unit")
-          .then(response => (this.availableTroops = response.data.content))
+          .then(response => (
+            this.availableTroops = response.data.content,
+            this.isTroopAvailable = this.isAnyTroopAvailable()
+          ))
         )).catch((error) => {
           this.availableTroops = null;
           alert(error.response.data.message);
