@@ -60,7 +60,6 @@ h1 {
   max-width: 100%;
   display: inline-block;
   vertical-align: top;
-  border: 1px solid red;
   float: left;
   margin-left: 20px !important;
   margin-bottom: 20px !important;
