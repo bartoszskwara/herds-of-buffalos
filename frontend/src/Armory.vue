@@ -2,7 +2,7 @@
   <div id="barracks">
     <h1>Zbrojownia</h1>
     <div class="armory">
-      <md-list class="md-double-line troop" :key="troop.unit.key" v-for="troop in troopUpgrades">
+      <md-list class="md-double-line troop" :key="troop.unit.key" v-for="troop in troopUpgrades" :class="opacityClass(troop)">
         <troop-armory :troop="troop"></troop-armory>
       </md-list>
     </div>
@@ -23,6 +23,12 @@ export default {
     }
   },
   methods: {
+    opacityClass(troop){
+      if(troop.levelsData[0].upgradeRequirementsMet == false && troop.levelsData[0].enabled == false){
+        return "disabled";
+      }
+      return "";
+    }
   },
   mounted: function(){
     const axios = require('axios').default;
@@ -69,5 +75,7 @@ h1 {
 .armory {
 
 }
-
+.disabled {
+  opacity: 30%;
+}
 </style>

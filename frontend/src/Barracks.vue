@@ -1,5 +1,6 @@
 <template>
   <div id="barracks">
+    <div class="site">
     <h1>Koszary</h1>
     <recruitment-queue></recruitment-queue>
     <div v-if="availableTroops !=null && isTroopAvailable == true">
@@ -10,6 +11,7 @@
     <div v-else>
       <p class="info">Aby rekrutować jednostki w tym budynku, zbadaj je najpierw w zbrojowni!</p>
     </div>
+  </div>
   </div>
 </template>
 
@@ -111,7 +113,11 @@ h1 {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
-p.info {
+.info {
   text-align: center;
+}
+.site {
+  display: flex;
+  flex-direction: column;
 }
 </style>

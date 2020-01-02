@@ -1,6 +1,9 @@
 <template>
   <div id="pasture">
+    <div class="site">
     <h1>Pastwisko</h1>
+      <recruitment-queue></recruitment-queue>
+
     <div v-if="availableTroops !=null && isTroopAvailable">
       <md-list class="md-double-line troop" :key="troop.unit.label" v-for="troop in availableTroops">
         <troop-recruit v-if="troop.levelsData[0].enabled == true" :troop="troop" :resources="activeCity.resources"></troop-recruit>
@@ -9,14 +12,16 @@
     <div v-else>
       <p class="info">Aby rekrutować jednostki w tym budynku, zbadaj je najpierw w zbrojowni!</p>
     </div>
+    </div>
   </div>
 </template>
 
 <script>
 import TroopRecruit from "./TroopRecruit.vue";
+import RecruitmentQueue from "./RecruitmentQueue.vue";
 
 export default {
-  components: {TroopRecruit},
+  components: {TroopRecruit, RecruitmentQueue},
   data() {
     return {
       alertMaxLevel: false,
@@ -108,7 +113,13 @@ h1 {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
-p.info {
+.info {
   text-align: center;
 }
+.site {
+  display: flex;
+  flex-direction: column;
+}
+
+
 </style>
