@@ -16,5 +16,6 @@ public class UnitLevelDataDto extends BaseDto {
     private Boolean enabled;
     private ResourcesDto upgradingCost;
     private Boolean upgradeRequirementsMet;
+    private Integer maxToRecruit;
 }
 

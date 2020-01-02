@@ -19,14 +19,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.buffalosoftware.entity.Resource.clay;
 import static com.buffalosoftware.entity.Resource.iron;
 import static com.buffalosoftware.entity.Resource.wood;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
@@ -86,7 +89,7 @@ public class UnitService implements IUnitService {
                                 .building(Unit.getBuildingByUnit(unit).map(Building::name).orElse(null))
                                 .build())
                         .maxLevel(unit.getMaxLevel())
-                        .levelsData(createUnitLevelsDataList(unit, availableUnitLevels.get(unit), city))
+                        .levelsData(createListOfAllUnitLevels(unit, availableUnitLevels.get(unit), city))
                         .build())
                 .collect(toList());
     }
@@ -114,12 +117,53 @@ public class UnitService implements IUnitService {
                                 .building(building.name())
                                 .build())
                         .maxLevel(unit.getMaxLevel())
-                        .levelsData(createUnitLevelsDataList(unit, unitLevelsInBuilding.get(unit), city))
+                        .levelsData(createAvailableUnitLevelsList(unit, unitLevelsInBuilding.get(unit), city))
                         .build())
                 .collect(toList());
     }
 
-    private List<UnitLevelDataDto> createUnitLevelsDataList(Unit unit, List<Integer> availableLevels, City city) {
+    private List<UnitLevelDataDto> createAvailableUnitLevelsList(Unit unit, List<Integer> availableLevels, City city) {
+        if(isEmpty(availableLevels)) {
+            return emptyList();
+        }
+        return availableLevels.stream()
+                .map(level -> {
+                    Cost recruitmentCostForLevel = unit.getRecruitmentCostForLevel(level);
+                    ResourcesDto recruitmentCost = mapCost(recruitmentCostForLevel);
+
+                    return UnitLevelDataDto.builder()
+                            .level(level)
+                            .amountInCity(city.getCityUnits().stream()
+                                    .filter(u -> unit.equals(u.getUnit()) && level.equals(u.getLevel()))
+                                    .findFirst()
+                                    .map(CityUnit::getAmount)
+                                    .orElse(0))
+                            .maxToRecruit(calculateMaxNumberOfUnitsToRecruit(recruitmentCost, city.getCityResources()))
+                            .skills(unit.getSkillsForLevel(level))
+                            .recruitmentCost(recruitmentCost)
+                            .build();
+                })
+                .sorted(Comparator.comparing(UnitLevelDataDto::getLevel))
+                .collect(toList());
+    }
+
+    private Integer calculateMaxNumberOfUnitsToRecruit(ResourcesDto recruitmentCost, Set<CityResources> cityResources) {
+        Map<Resource, Integer> amountOfResources = new HashMap<>();
+        amountOfResources.put(wood, recruitmentCost.getWood());
+        amountOfResources.put(clay, recruitmentCost.getClay());
+        amountOfResources.put(iron, recruitmentCost.getIron());
+
+        return Stream.of(Resource.values())
+                .mapToInt(res -> {
+                    Integer resInCity = getAmountOf(res, cityResources);
+                    Integer recruitmentResourceCost = amountOfResources.get(res);
+                    return recruitmentResourceCost != 0 ? resInCity / recruitmentResourceCost : 0;
+                })
+                .min()
+                .orElse(0);
+    }
+
+    private List<UnitLevelDataDto> createListOfAllUnitLevels(Unit unit, List<Integer> availableLevels, City city) {
         return IntStream.rangeClosed(1, unit.getMaxLevel()).boxed()
                 .map(level -> {
                     Cost recruitmentCostForLevel = unit.getRecruitmentCostForLevel(level);
