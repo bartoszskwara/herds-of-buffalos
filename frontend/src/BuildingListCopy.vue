@@ -1,47 +1,20 @@
 <template>
   <div id="buildings">
-    <md-toolbar :md-elevation="1">
-        <span class="md-title">Rozbudowa</span>
-      </md-toolbar>
-      <md-list class="md-double-line md-dense">
-        <div :key="building.building.key" v-for="building in buildingsArray">
-        <md-list-item v-if="building.building.maxLevel != building.currentLevel">
-          <div class="md-list-item-text" style="flex-grow:1">
-            <span>{{building.building.label}}</span>
-            <span>Poziom {{building.currentLevel}}</span>
-          </div>
-          <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
-            <span>{{building.cost.wood}}</span>
-          </div>
-          <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
-            <span>{{building.cost.clay}}</span>
-          </div>
-          <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
-            <span>{{building.cost.iron}}</span>
-          </div>
-          <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/time.svg')" /></span>
-            <span>1:29:26</span>
-          </div>
-          <div class="md-list-item-text" style="flex-grow:1">
+    <div :key="building.building.key" v-for="building in buildingsArray">
+      <md-list class="md-double-line" v-if="building.building.maxLevel != building.currentLevel">
+        <building :building="building"></building>
+        <md-list-item>
+          <div class="md-list-item-text">
             <md-button class="md-raised md-primary" @click="upgrade(building)" :disabled="!building.requirementsMet">Rozbuduj</md-button>
           </div>
         </md-list-item>
-        <md-list-item v-else>
-          <div class="md-list-item-text" style="flex-grow:1">
-            <span>{{building.building.label}}</span>
-            <span>Poziom {{building.currentLevel}}</span>
-          </div>
-          <div class="md-list-item-text" style="flex-grow:5">
-            <span>Osiągnięto maksymalny poziom rozbudowy tego budynku.</span>
-          </div>
-
-        </md-list-item>
-      </div>
       </md-list>
+    </div>
+    <div :key="building.building.key+1" v-for="building in buildingsArray">
+      <md-list class="md-double-line" v-if="building.building.maxLevel == building.currentLevel">
+        <building :building="building"></building>
+      </md-list>
+    </div>
 
     <md-dialog-alert
       :md-active.sync="alertMaxLevel"
@@ -51,9 +24,10 @@
 </template>
 
 <script>
+import Building from "./Building.vue";
 
 export default {
-  components: {},
+  components: {Building},
   data() {
     return {
       alertMaxLevel: false,
@@ -116,25 +90,14 @@ export default {
 
 <style>
   .md-list {
-    width: auto;
+    width: 320px;
     min-width: 320px;
     max-width: 100%;
     display: inline-block;
     vertical-align: top;
     border: 1px solid rgba(#000, .12);
-  }
-  .md-list-item-text {
-    text-align: center;
-  }
-  .md-list-item {
-    border-bottom: 1px solid #e8e8e8 !important;
-  }
-  .md-icon {
-    width: 0 !important;
-    min-height: 110%;
-  }
-  .mat {
-    margin: auto !important;
-    margin-bottom: 5px !important;
+    float: left;
+    margin-left: 20px !important;
+    margin-bottom: 20px !important;
   }
 </style>

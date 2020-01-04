@@ -2,10 +2,12 @@
   <div id="machinefactory">
     <div class="site">
     <h1>Fabryka maszyn</h1>
-    <div v-if="availableTroops !=null && isTroopAvailable">
-      <md-list class="md-double-line troop" :key="troop.unit.label" v-for="troop in availableTroops">
-        <troop-recruit v-if="troop.levelsData[0].enabled == true" :troop="troop" :resources="activeCity.resources"></troop-recruit>
-      </md-list>
+    <div v-if="availableTroops !=null && isTroopAvailable == true">
+      <div :key="troop.unit.label" v-for="troop in availableTroops">
+        <md-list class="md-double-line troop" v-if="troop.levelsData[0].enabled == true">
+          <troop-recruit :troop="troop" :resources="activeCity.resources"></troop-recruit>
+        </md-list>
+      </div>
     </div>
     <div v-else>
       <p class="info">Aby rekrutować jednostki w tym budynku, zbadaj je najpierw w zbrojowni!</p>
