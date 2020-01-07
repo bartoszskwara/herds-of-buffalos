@@ -23,6 +23,7 @@
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <project.version>1.0-SNAPSHOT</project.version>
         <swagger.version>2.9.2</swagger.version>
+        <validation.version>2.0.2</validation.version>
     </properties>
 
     <dependencyManagement>
@@ -107,6 +108,12 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${validation.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

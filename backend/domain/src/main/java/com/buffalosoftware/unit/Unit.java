@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.buffalosoftware.entity.Building.barracks;
 import static com.buffalosoftware.entity.Building.machineFactory;
@@ -66,6 +67,7 @@ public enum Unit implements ICostEntity {
     private Double nextLevelCostFactor;
     private Double nextLevelSkillsFactor;
 
+    private final static Map<String, Unit> unitByName;
     private final static Map<Unit, Cost> firstLevelRecruitmentCostMap;
     private final static Map<Unit, Cost> firstLevelUpgradingCostMap;
     private final static Map<Unit, UnitSkills> firstLevelUnitSkillsMap;
@@ -73,6 +75,9 @@ public enum Unit implements ICostEntity {
     private final static Map<Building, List<Unit>> unitsByBuildingMap;
 
     static {
+        unitByName = new HashMap<>();
+        Stream.of(values()).forEach(u -> unitByName.put(u.name(), u));
+
         firstLevelRecruitmentCostMap = new HashMap<>();
         firstLevelRecruitmentCostMap.put(citizen, new Cost(10, 10, 10));
         firstLevelRecruitmentCostMap.put(spearman, new Cost(30, 30, 40));
@@ -140,6 +145,10 @@ public enum Unit implements ICostEntity {
 
     public static List<Unit> getUnitsByBuilding(Building building) {
         return unitsByBuildingMap.get(building) != null ? unitsByBuildingMap.get(building) : emptyList();
+    }
+
+    public static Optional<Unit> getByKey(String key) {
+        return ofNullable(unitByName.get(key));
     }
 
     public static List<Unit> list() {

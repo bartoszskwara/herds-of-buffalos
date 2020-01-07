@@ -1,8 +1,6 @@
-package com.buffalosoftware.dto.building;
+package com.buffalosoftware.dto.unit;
 
 import com.buffalosoftware.dto.BaseDto;
-import com.buffalosoftware.dto.resources.ResourcesDto;
-import com.buffalosoftware.unit.UnitSkills;
 import lombok.Builder;
 import lombok.Getter;
 
