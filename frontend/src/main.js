@@ -9,6 +9,7 @@ import Pasture from './Pasture.vue'
 import Shipyard from './Shipyard.vue'
 import MachineFactory from './MachineFactory.vue'
 import Armory from './Armory.vue'
+import SendTroops from './SendTroops.vue'
 import Map from './Map.vue'
 import Market from './Market.vue'
 import Profile from './Profile.vue'
@@ -17,7 +18,6 @@ import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
-
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
@@ -36,10 +36,11 @@ const router = new VueRouter({
     { path: '/machinefactory', component: MachineFactory },
     { path: '/armory', component: Armory },
     { path: '/market', component: Market },
+    { path: '/sendtroops', name: 'sendtroops', component: SendTroops, props: true },
     { path: '/map', component: Map },
     { path: '/scoreboard', component: Scoreboard },
     { path: '/reports', component: Reports },
-    { path: '/profile', name: 'profile', component: Profile, props: true}
+    { path: '/profile', name: 'profile', component: Profile, props: true }
   ]
 })
 

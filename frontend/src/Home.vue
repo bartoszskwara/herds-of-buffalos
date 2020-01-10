@@ -8,7 +8,7 @@
       <div class="rightPanel">
         <player-info :player="player" :activeCity="activeCity"></player-info>
         <resources-panel :resources="activeCity.resources"></resources-panel>
-        <troops-panel :troops="troopsArray"></troops-panel>
+        <troops-panel :troops="troopsArray" :player="player" @updateTroops="updateTroops($event)"></troops-panel>
       </div>
     </div>
   </div>
@@ -40,6 +40,9 @@ export default {
       player: {},
       activeCity: {resources: {}},
     }
+  },
+  updateTroops(list){
+    this.troopsArray = list;
   },
   mounted: function(){
     const axios = require('axios').default;
@@ -80,7 +83,9 @@ h1 {
 .leftPanel {
   flex: 1;
 }
-
+.md-icon.chevron {
+  width: 40px !important;
+}
 
 .rightPanel {
 

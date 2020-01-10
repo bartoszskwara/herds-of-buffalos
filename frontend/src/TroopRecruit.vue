@@ -4,7 +4,7 @@
       <span class="md-title">{{troop.unit.label}}</span>
     </md-toolbar>
     <div v-bind:key="unitKind.level" v-for="unitKind in troop.levelsData">
-      <md-list-item v-if="unitKind.enabled == true">
+      <md-list-item>
         <div class="md-list-item-text level" style="flex-grow: 1">
           <md-icon class="chevron" :md-src="require('./assets/chevron'+unitKind.level+'.svg')"></md-icon>
         </div>
@@ -50,7 +50,7 @@
         </div>
 
         <div class="md-list-item-text" style="flex-grow: 2">
-          <md-button class="md-raised md-primary" @click="recruit(troop.unit.label, unitKind.level-1, unitKind.recruitmentCost)" :disabled="recruitCount[unitKind.level-1] > 0 ? false : true">Rekrutuj</md-button>
+          <md-button class="md-raised md-primary" @click="recruit(troop.unit.key, troop.unit.label, unitKind.level, unitKind.recruitmentCost)" :disabled="recruitCount[unitKind.level-1] > 0 ? false : true">Rekrutuj</md-button>
         </div>
       </md-list-item>
     </div>
@@ -62,6 +62,8 @@
 </template>
 
 <script>
+import { EventBus } from './event-bus.js';
+
 export default {
   data() {
     return {
@@ -74,7 +76,8 @@ export default {
   },
   props: {
     troop: Object,
-    resources: Object
+    resources: Object,
+    player: Object,
   },
   methods: {
     isNumber: function(evt) {
@@ -86,20 +89,35 @@ export default {
         return true;
       }
     },
-    recruit(label, lvl, cost) {
+    recruit(key, label, lvl, cost) {
       this.check = cost.clay;
-      if(cost.wood*this.recruitCount[lvl] <= this.resources.wood
-         && cost.clay*this.recruitCount[lvl] <= this.resources.clay
-          && cost.iron*this.recruitCount[lvl] <= this.resources.iron){
+      if(cost.wood*this.recruitCount[lvl-1] <= this.resources.wood
+         && cost.clay*this.recruitCount[lvl-1] <= this.resources.clay
+          && cost.iron*this.recruitCount[lvl-1] <= this.resources.iron){
         this.showSnackbar = true;
-        this.snackbarRecruitCount = this.recruitCount[lvl];
-        this.recruitCount[lvl] = null;
-        this.snackbarText = "Rozpoczęto rekrutację "+this.snackbarRecruitCount+" jednostek typu "+label+" na poziomie "+(lvl+1)+".";
+        this.snackbarRecruitCount = this.recruitCount[lvl-1];
+        this.snackbarText = "Rozpoczęto rekrutację "+this.snackbarRecruitCount+" jednostek typu "+label+" na poziomie "+(lvl)+".";
+        const axios = require('axios').default;
+        axios.post('http://localhost:8088/user/'+this.player.id+'/city/'+this.player.currentCityId+'/unit/', {
+                    "amount": parseInt(this.recruitCount[lvl-1]),
+                    "level": parseInt(lvl),
+                    "unit": String(key)
+                }).then(() => {
+                  EventBus.$emit('unit-recruited')
+                })
+                .catch(function(error) {
+                  alert(error);
+                })
+      this.recruitCount[lvl-1] = null;
+
       }
       else {
         this.showSnackbar = true;
         this.snackbarText = "Nie masz wystarczającej ilości zasobów, by zrekrutować tyle jednostek.";
       }
+
+
+
     },
     getMaxRecruitCount(cost){
       var w, c, i;
@@ -174,6 +192,5 @@ export default {
 .chevron {
   height: 110%;
   text-align: center;
-  width: 40px;
 }
 </style>

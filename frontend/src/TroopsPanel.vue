@@ -33,15 +33,18 @@
 </template>
 
 <script>
+import { EventBus } from './event-bus.js';
 
 export default {
   data() {
     return {
       pastureCapacity: 13000,
+      updatedTroops: Array,
     }
   },
   props: {
     troops: Array,
+    player: Object
   },
   methods: {
     setPastureStyle(){
@@ -74,6 +77,21 @@ export default {
     progressCapacity: function() {
       return this.allTroops/this.pastureCapacity*100;
     }
+  },
+  mounted() {
+    EventBus.$on('unit-recruited', () => {
+      const axios = require('axios').default;
+          axios
+          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/unit")
+          .then(response => (
+            this.updatedTroops = response.data.content,
+            this.troops = this.updatedTroops
+          )).catch((error) => {
+          alert(error.response.data.message);
+        })
+
+        this.$emit("updateTroops", this.updatedTroops);
+    });
   }
 }
 </script>
@@ -87,9 +105,6 @@ export default {
 }
 .first {
   border-top: 1px solid #d6d6d6;
-}
-.md-icon {
-  width: 0px;
 }
 .nick {
   padding-right: 35%;
@@ -109,8 +124,6 @@ export default {
   font-family: Sui Generis;
 }
 .level {
-  display: flex;
-  flex-direction: row;
   padding-right: 10px;
   padding-left: 10px;
 }
@@ -118,7 +131,6 @@ export default {
   height: 110%;
   text-align: center;
   padding-right: 0px;
-  width: 40px;
 }
 .unitSymbol {
   text-align: center;

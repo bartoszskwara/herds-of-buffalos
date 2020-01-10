@@ -4,13 +4,24 @@
     <div class="mapView">
       <div class="wioska" v-bind:key="village.name" v-for="village in allCities"
         v-bind:style="stylePositionVillage(village)" @click="villageClicked(village)">
-        <div class="activeCity" v-if="village.user.id == player.id"></div>
+        <div class="yourCity" v-if="village.user.id == player.id" v-bind:style="village.id == player.currentCityId ? 'background-color: #fff700' : ''"></div>
         <img :src="setVillageImage(village)" />
         <md-tooltip md-direction="top"><b>Gracz:</b>  {{village.user.name}}
         <br><b>Wioska:</b>  {{village.name}}
         <br><b>Punkty:</b>  {{village.points}}</md-tooltip>
       </div>
     </div>
+    <div class="legenda">
+      <div class="legendaElement">
+        <div class="yourCityLegenda" style="background-color: #fff700"></div>
+        <div>Twoja aktywna wioska</div>
+      </div>
+      <div class="legendaElement">
+        <div class="yourCityLegenda"></div>
+        <div>Twoja wioska</div>
+      </div>
+    </div>
+
 
     <md-dialog :md-active.sync="villageDialog">
       <md-dialog-title class="dialogHeader">
@@ -20,7 +31,7 @@
       </md-dialog-title>
 
       <div class="dialogButtons">
-        <md-button class="md-raised md-accent">Wyślij wojska</md-button>
+        <md-button class="md-raised md-accent" @click="sendTroops(chosenVillage)">Wyślij wojska</md-button>
         <md-button class="md-raised md-primary" @click="showProfile(chosenVillage.user.id)">Profil gracza</md-button>
       </div>
     </md-dialog>
@@ -95,6 +106,9 @@ export default {
       },
       showProfile(id){
         this.$router.push({ name: 'profile', params: {userId: id }})
+      },
+      sendTroops(village){
+        this.$router.push({ name: 'sendtroops', params: {village: village }})
       }
     }
   }
@@ -138,7 +152,7 @@ export default {
     text-align: center;
     cursor: pointer;
   }
-  .activeCity {
+  .yourCity {
     background-color: #00ff1a;
     width: 10px;
     height: 10px;
@@ -146,6 +160,32 @@ export default {
     left: 5px;
     border-radius: 15px;
     border: 1px solid black;
+  }
+  .yourCityLegenda {
+    background-color: #00ff1a;
+    width: 10px;
+    height: 10px;
+    border-radius: 15px;
+    border: 1px solid black;
+    margin-top: 5px;
+    margin-right: 10px;
+  }
+  .legenda {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin: auto;
+    margin-top: 30px;
+
+    width: 300px;
+    height: auto;
+    border: 1px solid grey;
+    padding: 10px 20px;
+  }
+  .legendaElement {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
   .md-tooltip {
     height: auto !important;
