@@ -9,7 +9,7 @@
           <div class="md-list-item-text">
             <md-field>
               <label>Ilość</label>
-              <md-icon class="chevron" :md-src="require('./assets/chevron'+troopKind.level+'.svg')"></md-icon>
+              <md-icon class="chevron" :md-src="require('../assets/chevron'+troopKind.level+'.svg')"></md-icon>
               <md-input v-model="troopKind.chosen" @keypress="isNumber($event)"></md-input>
 
             </md-field>

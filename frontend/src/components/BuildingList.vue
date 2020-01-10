@@ -7,23 +7,23 @@
         <div :key="building.building.key" v-for="building in buildingsArray">
         <md-list-item v-if="building.building.maxLevel != building.currentLevel">
           <div class="md-list-item-text" style="flex-grow:1">
-            <span>{{building.building.label}}</span>
+            <span><a class="buildingLabel" @click='setRoute(building.building.key)'>{{building.building.label}}</a></span>
             <span>Poziom {{building.currentLevel}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
+            <span><md-icon class="mat" :md-src="require('../assets/wood.svg')" /></span>
             <span>{{building.cost.wood}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
+            <span><md-icon class="mat" :md-src="require('../assets/clay.svg')" /></span>
             <span>{{building.cost.clay}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
+            <span><md-icon class="mat" :md-src="require('../assets/iron.svg')" /></span>
             <span>{{building.cost.iron}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:1">
-            <span><md-icon class="mat" :md-src="require('./assets/time.svg')" /></span>
+            <span><md-icon class="mat" :md-src="require('../assets/time.svg')" /></span>
             <span>1:29:26</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:1">
@@ -32,7 +32,7 @@
         </md-list-item>
         <md-list-item v-else>
           <div class="md-list-item-text" style="flex-grow:1">
-            <span>{{building.building.label}}</span>
+            <span><a class="buildingLabel" @click='setRoute(building.building.key)'>{{building.building.label}}</a></span>
             <span>Poziom {{building.currentLevel}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:5">
@@ -108,6 +108,9 @@ export default {
         this.alertText = "Ten budynek został już rozbudowany do najwyższego poziomu!";
         this.alertMaxLevel = true;
       }
+    },
+    setRoute(link){
+      this.$router.push(link);
     }
   }
 
@@ -136,5 +139,13 @@ export default {
   .mat {
     margin: auto !important;
     margin-bottom: 5px !important;
+  }
+  a.buildingLabel {
+    color: rgba(0,0,0,0.87) !important;
+  }
+  a.buildingLabel:hover {
+    cursor: pointer;
+    color: #852800 !important;
+    text-decoration: none !important;
   }
 </style>

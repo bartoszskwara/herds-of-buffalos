@@ -10,7 +10,7 @@
           <span>Jednostka</span>
         </div>
         <div class="md-list-item-text level" style="flex-grow: 0.5">
-          <md-icon class="chevron" :md-src="require('./assets/chevron'+task.level+'.svg')"></md-icon>
+          <md-icon class="chevron" :md-src="require('../assets/chevron'+task.level+'.svg')"></md-icon>
         </div>
 
         <div class="md-list-item-text" style="flex-grow: 2">
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import queue from "./assets/recruitmentQueue.js";
+import queue from "../assets/recruitmentQueue.js";
 
 export default {
   data() {

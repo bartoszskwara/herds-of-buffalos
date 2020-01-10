@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import TroopRecruit from "./TroopRecruit.vue";
-import RecruitmentQueue from "./RecruitmentQueue.vue";
+import TroopRecruit from "../components/TroopRecruit.vue";
+import RecruitmentQueue from "../components/RecruitmentQueue.vue";
 
 export default {
   components: {TroopRecruit, RecruitmentQueue},

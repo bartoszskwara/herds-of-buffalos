@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import TroopArmory from "./TroopArmory.vue";
+import TroopArmory from "../components/TroopArmory.vue";
 
 export default {
   components: {TroopArmory},

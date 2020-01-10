@@ -9,24 +9,24 @@
         <md-table-cell md-label="Nick">{{ item.nick }}</md-table-cell>
         <md-table-cell md-label="Oferuje">
           <span class="cell">
-            <md-icon class="mat" :md-src="require('./assets/wood.svg')" /><div class="mat">{{item.supply.wood}}</div>
+            <md-icon class="mat" :md-src="require('../assets/wood.svg')" /><div class="mat">{{item.supply.wood}}</div>
           </span>
           <span class="cell">
-            <md-icon class="mat" :md-src="require('./assets/clay.svg')" /><div class="mat">{{item.supply.clay}}</div>
+            <md-icon class="mat" :md-src="require('../assets/clay.svg')" /><div class="mat">{{item.supply.clay}}</div>
           </span>
           <span class="cell">
-            <md-icon class="mat" :md-src="require('./assets/iron.svg')" /><div class="mat">{{item.supply.iron}}</div>
+            <md-icon class="mat" :md-src="require('../assets/iron.svg')" /><div class="mat">{{item.supply.iron}}</div>
           </span>
         </md-table-cell>
         <md-table-cell md-label="W zamian za">
           <span class="cell">
-            <md-icon class="mat" :md-src="require('./assets/wood.svg')" /><div class="mat">{{item.demand.wood}}</div>
+            <md-icon class="mat" :md-src="require('../assets/wood.svg')" /><div class="mat">{{item.demand.wood}}</div>
           </span>
           <span class="cell">
-            <md-icon class="mat" :md-src="require('./assets/clay.svg')" /><div class="mat">{{item.demand.clay}}</div>
+            <md-icon class="mat" :md-src="require('../assets/clay.svg')" /><div class="mat">{{item.demand.clay}}</div>
           </span>
           <span class="cell">
-            <md-icon class="mat" :md-src="require('./assets/iron.svg')" /><div class="mat">{{item.demand.iron}}</div>
+            <md-icon class="mat" :md-src="require('../assets/iron.svg')" /><div class="mat">{{item.demand.iron}}</div>
           </span>
         </md-table-cell>
         <md-table-cell md-label="Data utworzenia">{{ item.date }}</md-table-cell>

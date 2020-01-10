@@ -18,7 +18,7 @@
             <md-icon>face</md-icon>
           </div>
           <div class="md-list-item-text level" style="flex-grow: 2" v-if="isNaN(troopKind.level) == false">
-            <md-icon class="chevron" :md-src="require('./assets/chevron'+troopKind.level+'.svg')"></md-icon>
+            <md-icon class="chevron" :md-src="require('../assets/chevron'+troopKind.level+'.svg')"></md-icon>
 
           </div>
           <div class="md-list-item-text" style="flex-grow: 2">
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { EventBus } from './event-bus.js';
+import { EventBus } from '../event-bus.js';
 
 export default {
   data() {

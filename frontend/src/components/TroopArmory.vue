@@ -6,29 +6,29 @@
     </md-toolbar>
     <md-list-item :key="troopKind.level" v-for="troopKind in troop.levelsData">
       <div class="md-list-item-text" style="flex-grow: 1">
-        <md-icon class="chevron" :md-src="require('./assets/chevron'+troopKind.level+'.svg')"></md-icon>
+        <md-icon class="chevron" :md-src="require('../assets/chevron'+troopKind.level+'.svg')"></md-icon>
       </div>
       <div class="md-list-item-text" style="flex-grow: 0.7">
-        <span><md-icon class="mat strength" :md-src="require('./assets/attack.svg')" /></span>
+        <span><md-icon class="mat strength" :md-src="require('../assets/attack.svg')" /></span>
         <span class="textLabel">{{troopKind.skills.attack}}</span>
       </div>
       <div class="md-list-item-text" style="flex-grow: 0.7">
-        <span><md-icon class="mat strength" :md-src="require('./assets/defense.svg')" /></span>
+        <span><md-icon class="mat strength" :md-src="require('../assets/defense.svg')" /></span>
         <span class="textLabel">{{troopKind.skills.defense}}</span>
       </div>
       <div class="md-list-item-text" style="flex-grow: 0.7">
-        <span><md-icon class="mat strength" :md-src="require('./assets/health.svg')" /></span>
+        <span><md-icon class="mat strength" :md-src="require('../assets/health.svg')" /></span>
         <span class="textLabel">{{troopKind.skills.defense}}</span>
       </div>
       <div class="md-list-item-text surowce" style="flex-grow: 2" v-if="!troopKind.enabled">
         <span class="cell">
-          <md-icon class="mat" :md-src="require('./assets/wood.svg')" /><div class="upgradeCost">{{troopKind.upgradingCost.wood}}</div>
+          <md-icon class="mat" :md-src="require('../assets/wood.svg')" /><div class="upgradeCost">{{troopKind.upgradingCost.wood}}</div>
         </span>
         <span class="cell">
-          <md-icon class="mat" :md-src="require('./assets/clay.svg')" /><div class="upgradeCost">{{troopKind.upgradingCost.clay}}</div>
+          <md-icon class="mat" :md-src="require('../assets/clay.svg')" /><div class="upgradeCost">{{troopKind.upgradingCost.clay}}</div>
         </span>
         <span class="cell">
-          <md-icon class="mat" :md-src="require('./assets/iron.svg')" /><div class="upgradeCost">{{troopKind.upgradingCost.iron}}</div>
+          <md-icon class="mat" :md-src="require('../assets/iron.svg')" /><div class="upgradeCost">{{troopKind.upgradingCost.iron}}</div>
         </span>
       </div>
       <div class="md-list-item-text btn" style="flex-grow: 2" v-if="!troopKind.enabled">
@@ -36,7 +36,7 @@
       </div>
       <div class="md-list-item-text" style="flex-grow: 4" v-if="troopKind.enabled">
         <span>
-          <md-icon class="mat" :md-src="require('./assets/upgraded.svg')" />
+          <md-icon class="mat" :md-src="require('../assets/upgraded.svg')" />
         </span>
         <span>
           <p>Jednostka została już zbadana!</p>

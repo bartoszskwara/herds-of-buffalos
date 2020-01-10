@@ -6,7 +6,7 @@
     <div v-bind:key="unitKind.level" v-for="unitKind in troop.levelsData">
       <md-list-item>
         <div class="md-list-item-text level" style="flex-grow: 1">
-          <md-icon class="chevron" :md-src="require('./assets/chevron'+unitKind.level+'.svg')"></md-icon>
+          <md-icon class="chevron" :md-src="require('../assets/chevron'+unitKind.level+'.svg')"></md-icon>
         </div>
 
         <div class="md-list-item-text" style="flex-grow: 2">
@@ -14,30 +14,30 @@
           <span class="textLabel">Ilość</span>
         </div>
         <div class="md-list-item-text divider" style="flex-grow: 1">
-          <span><md-icon class="mat" :md-src="require('./assets/attack.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/attack.svg')" /></span>
           <span class="textLabel">{{unitKind.skills.attack}}</span>
         </div>
         <div class="md-list-item-text" style="flex-grow: 1">
-          <span><md-icon class="mat" :md-src="require('./assets/defense.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/defense.svg')" /></span>
           <span class="textLabel">{{unitKind.skills.defense}}</span>
         </div>
         <div class="md-list-item-text" style="flex-grow: 1">
-          <span><md-icon class="mat" :md-src="require('./assets/health.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/health.svg')" /></span>
           <span class="textLabel">{{unitKind.skills.health}}</span>
         </div>
 
         <div class="md-list-item-text divider">
-          <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/wood.svg')" /></span>
           <span class="textLabel">{{unitKind.recruitmentCost.wood}}</span>
         </div>
 
         <div class="md-list-item-text">
-          <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/clay.svg')" /></span>
           <span class="textLabel">{{unitKind.recruitmentCost.clay}}</span>
         </div>
 
         <div class="md-list-item-text">
-          <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/iron.svg')" /></span>
           <span class="textLabel">{{unitKind.recruitmentCost.iron}}</span>
         </div>
 
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { EventBus } from './event-bus.js';
+import { EventBus } from '../event-bus.js';
 
 export default {
   data() {

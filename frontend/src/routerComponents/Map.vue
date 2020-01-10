@@ -86,7 +86,7 @@ export default {
         return positionStyle;
       },
       setVillageImage(village){
-        var image = require.context('./assets/', false, /\.png$/)
+        var image = require.context('../assets/', false, /\.png$/)
         if(village.points < 300){
           return image('./wioska1.png')
         }

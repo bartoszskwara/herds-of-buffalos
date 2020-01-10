@@ -11,17 +11,17 @@
       </md-list-item>
       <md-list-item layout="row">
         <div class="md-list-item-text">
-          <span><md-icon class="mat" :md-src="require('./assets/wood.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/wood.svg')" /></span>
           <span>{{resources.wood}}</span>
         </div>
 
         <div class="md-list-item-text">
-          <span><md-icon class="mat" :md-src="require('./assets/clay.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/clay.svg')" /></span>
           <span>{{resources.clay}}</span>
         </div>
 
         <div class="md-list-item-text">
-          <span><md-icon class="mat" :md-src="require('./assets/iron.svg')" /></span>
+          <span><md-icon class="mat" :md-src="require('../assets/iron.svg')" /></span>
           <span>{{resources.iron}}</span>
         </div>
       </md-list-item>

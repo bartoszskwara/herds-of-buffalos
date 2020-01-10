@@ -1,31 +1,26 @@
 <template>
-  <div id="shipyard">
-    <div class="site">
-    <h1>Stocznia</h1>
-    <div v-if="availableTroops !=null && isTroopAvailable == true">
-      <div :key="troop.unit.label" v-for="troop in availableTroops">
-        <md-list class="md-double-line troop" v-if="troop.levelsData[0].enabled == true">
-          <troop-recruit :troop="troop" :resources="activeCity.resources"></troop-recruit>
+  <div id="townhall">
+
+      <h1>Ratusz</h1>
+      <div v-if="availableTroops !=null">
+        <md-list class="md-double-line troop" :key="troop.unit.key" v-for="troop in availableTroops">
+          <troop-recruit v-if="troop.levelsData[0].enabled == true" :troop="troop" :resources="activeCity.resources"></troop-recruit>
         </md-list>
       </div>
-    </div>
-    <div v-else>
-      <p class="info">Aby rekrutować jednostki w tym budynku, zbadaj je najpierw w zbrojowni!</p>
-    </div>
-    </div>
+      <building-list></building-list>
+
   </div>
 </template>
 
 <script>
-import TroopRecruit from "./TroopRecruit.vue";
+import BuildingList from "../components/BuildingList.vue";
+import TroopRecruit from "../components/TroopRecruit.vue";
 
 export default {
-  components: {TroopRecruit},
+  components: {BuildingList, TroopRecruit},
   data() {
     return {
-      alertMaxLevel: false,
       player: {},
-      isTroopAvailable: true,
       activeCity: {},
       availableTroops: [
                           {
@@ -56,48 +51,29 @@ export default {
                         ],
     }
   },
-  methods: {
-    isAnyTroopAvailable(){
-      var len = this.availableTroops.length;
-      for(var i = 0 ; i < len ; i++){
-        if(this.availableTroops[i].levelsData[0].enabled == true){
-          return true;
-        }
-      }
-      return false;
-    }
-  },
   mounted: function(){
     const axios = require('axios').default;
     axios
       .get("http://localhost:8088/user/current")
-      .then(response => (this.player = response.data,
+      .then(response => (
+        this.player = response.data,
         axios
         .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId)
         .then(response => (
           this.activeCity = response.data
         )),
         axios
-          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/shipyard/unit")
-          .then(response => (
-            this.availableTroops = response.data.content,
-            this.isTroopAvailable = this.isAnyTroopAvailable()
-          ))
+          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/townhall/unit")
+          .then(response => (this.availableTroops = response.data.content))
         )).catch((error) => {
           this.availableTroops = null;
           alert(error.response.data.message);
         })
   }
-
 }
 </script>
 
 <style scoped>
-h1 {
-  font-family: Sui Generis;
-  font-size: 30pt;
-  text-align: center;
-}
 .md-list.troop {
   width: 95% !important;
   min-width: 720px;
@@ -110,12 +86,5 @@ h1 {
   margin-bottom: 20px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-}
-.info {
-  text-align: center;
-}
-.site {
-  display: flex;
-  flex-direction: column;
 }
 </style>

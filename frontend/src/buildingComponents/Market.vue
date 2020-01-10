@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import MarketOffer from "./MarketOffer.vue";
-import OffersTable from "./OffersTable.vue";
+import MarketOffer from "../components/MarketOffer.vue";
+import OffersTable from "../components/OffersTable.vue";
 
 export default {
   components: {MarketOffer, OffersTable},

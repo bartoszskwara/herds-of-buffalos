@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import Destination from "./Destination.vue";
-import ChooseTroops from "./ChooseTroops.vue";
+import Destination from "../components/Destination.vue";
+import ChooseTroops from "../components/ChooseTroops.vue";
 
 export default {
   components: {Destination, ChooseTroops},

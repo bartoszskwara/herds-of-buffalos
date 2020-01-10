@@ -15,10 +15,10 @@
 </template>
 
 <script>
-import NavigationBar from "./NavigationBar.vue";
-import ResourcesPanel from "./ResourcesPanel.vue";
-import PlayerInfo from "./PlayerInfo.vue";
-import TroopsPanel from "./TroopsPanel.vue";
+import NavigationBar from "./menuComponents/NavigationBar.vue";
+import ResourcesPanel from "./menuComponents/ResourcesPanel.vue";
+import PlayerInfo from "./menuComponents/PlayerInfo.vue";
+import TroopsPanel from "./menuComponents/TroopsPanel.vue";
 
 export default {
   components: {NavigationBar, ResourcesPanel, PlayerInfo, TroopsPanel},
