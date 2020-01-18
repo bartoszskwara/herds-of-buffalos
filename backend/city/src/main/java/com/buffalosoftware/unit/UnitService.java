@@ -2,23 +2,28 @@ package com.buffalosoftware.unit;
 
 import com.buffalosoftware.Cost;
 import com.buffalosoftware.api.unit.IUnitService;
+import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.dto.unit.CityUnitDto;
 import com.buffalosoftware.dto.unit.RecruitmentDto;
 import com.buffalosoftware.dto.unit.UnitLevelDataDto;
 import com.buffalosoftware.dto.unit.UnitUpgradeDto;
 import com.buffalosoftware.dto.unit.UnitWithLevelsDto;
-import com.buffalosoftware.dto.resources.ResourcesDto;
+import com.buffalosoftware.dto.unit.UpgradeRequestDto;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
+import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.CityBuildingUnitLevel;
 import com.buffalosoftware.entity.CityResources;
 import com.buffalosoftware.entity.CityUnit;
 import com.buffalosoftware.entity.Resource;
 import com.buffalosoftware.entity.User;
+import com.buffalosoftware.repository.CityBuildingUnitLevelRepository;
 import com.buffalosoftware.repository.CityUnitRepository;
 import com.buffalosoftware.repository.UserRepository;
+import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,6 +50,8 @@ public class UnitService implements IUnitService {
 
     private final UserRepository userRepository;
     private final CityUnitRepository cityUnitRepository;
+    private final CityBuildingUnitLevelRepository cityBuildingUnitLevelRepository;
+    private final ResourceService resourceService;
 
     @Override
     public List<UnitWithLevelsDto> getUnitsInCity(Long userId, Long cityId) {
@@ -99,6 +106,58 @@ public class UnitService implements IUnitService {
     }
 
     @Override
+    @Transactional
+    public void upgradeUnit(Long userId, Long cityId, UpgradeRequestDto upgradeRequestDto) {
+        User user = userRepository.findUserWithCitiesById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
+        City city = user.getCities().stream()
+                .filter(c -> c.getId().equals(cityId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("City doesn't exist!"));
+        Unit unit = Unit.getByKey(upgradeRequestDto.getUnit()).orElseThrow(() -> new IllegalArgumentException("Unit doesn't exist!"));
+        CityBuilding cityBuilding = city.getCityBuildings().stream()
+                .filter(b -> unit.getBuilding().equals(b.getBuilding()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Building required for the unit doesn't exist in city!"));
+
+        CityBuildingUnitLevel cityBuildingUnitLevel = cityBuilding.getUnitLevels().stream()
+                .filter(u -> unit.equals(u.getUnit()) && upgradeRequestDto.getLevel().equals(u.getAvailableLevel()))
+                .findFirst()
+                .orElse(null);
+
+        if(cityBuildingUnitLevel == null) {
+            ResourcesDto cost = mapCost(unit.getUpgradingCostForLevel(upgradeRequestDto.getLevel()));
+            validateUnitUpgradeConditions(city, cityBuilding, unit, upgradeRequestDto.getLevel(), cost);
+            CityBuildingUnitLevel newUnitLevel = new CityBuildingUnitLevel();
+            newUnitLevel.setCityBuilding(cityBuilding);
+            newUnitLevel.setAvailableLevel(upgradeRequestDto.getLevel());
+            newUnitLevel.setUnit(unit);
+            cityBuildingUnitLevelRepository.save(newUnitLevel);
+            resourceService.decreaseResources(city, cost);
+        } else {
+            throw new IllegalArgumentException("Unit already enabled!");
+        }
+    }
+
+    private void validateUnitUpgradeConditions(City city, CityBuilding cityBuilding, Unit unit, Integer level, ResourcesDto cost) {
+        if(level > 1 && !isLevelEnabled(unit, level - 1, cityBuilding)) {
+            throw new IllegalArgumentException("Previous level not enabled!");
+        }
+        if(level > unit.getMaxLevel()) {
+            throw new IllegalArgumentException("Level not available!");
+        }
+        if(!resourceService.areResourceRequirementsMet(city.getCityResources(), cost)) {
+            throw new IllegalArgumentException("Not enough resources!");
+        }
+    }
+
+    private boolean isLevelEnabled(Unit unit, Integer level, CityBuilding cityBuilding) {
+        return cityBuilding.getUnitLevels().stream()
+                .anyMatch(u -> unit.equals(u.getUnit()) && level.equals(u.getAvailableLevel()));
+    }
+
+    @Override
+    @Transactional
     public void recruit(Long userId, Long cityId, RecruitmentDto recruitmentDto) {
         User user = userRepository.findUserWithCitiesById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
@@ -113,7 +172,8 @@ public class UnitService implements IUnitService {
             throw new IllegalArgumentException("Level not allowed!");
         }
 
-        validateRecruitmentConditions(city, unit, recruitmentDto);
+        ResourcesDto cost = mapCost(unit.getRecruitmentCostForLevel(recruitmentDto.getLevel()));
+        validateRecruitmentConditions(city, unit, recruitmentDto, cost);
 
         Optional<CityUnit> cityUnitOpt = cityUnitRepository.findByUnitAndCity_IdAndLevel(unit, city.getId(), recruitmentDto.getLevel());
         cityUnitOpt.ifPresentOrElse(
@@ -128,19 +188,14 @@ public class UnitService implements IUnitService {
                     newCityUnit.setCity(city);
                     cityUnitRepository.save(newCityUnit);
                 });
+        resourceService.decreaseResources(city, cost);
     }
 
-    private void validateRecruitmentConditions(City city, Unit unit, RecruitmentDto recruitmentDto) {
-        Cost recruitmentCostForLevel = unit.getRecruitmentCostForLevel(recruitmentDto.getLevel());
-        ResourcesDto cost = ResourcesDto.builder()
-                .wood(recruitmentDto.getAmount() * recruitmentCostForLevel.getWood())
-                .clay(recruitmentDto.getAmount() * recruitmentCostForLevel.getClay())
-                .iron(recruitmentDto.getAmount() * recruitmentCostForLevel.getIron())
-                .build();
+    private void validateRecruitmentConditions(City city, Unit unit, RecruitmentDto recruitmentDto, ResourcesDto cost) {
         if(!isUnitEnabled(city, unit, recruitmentDto.getLevel())) {
             throw new IllegalArgumentException("Level not enabled!");
         }
-        if(!areResourceRequirementsMet(city.getCityResources(), cost)) {
+        if(!resourceService.areResourceRequirementsMet(city.getCityResources(), cost)) {
             throw new IllegalArgumentException("Not enough resources!");
         }
     }
@@ -213,7 +268,7 @@ public class UnitService implements IUnitService {
 
         return Stream.of(Resource.values())
                 .mapToInt(res -> {
-                    Integer resInCity = getAmountOf(res, cityResources);
+                    Integer resInCity = resourceService.getAmountOf(res, cityResources);
                     Integer recruitmentResourceCost = amountOfResources.get(res);
                     return recruitmentResourceCost != 0 ? resInCity / recruitmentResourceCost : 0;
                 })
@@ -225,7 +280,7 @@ public class UnitService implements IUnitService {
         return IntStream.rangeClosed(1, unit.getMaxLevel()).boxed()
                 .map(level -> {
                     Cost recruitmentCostForLevel = unit.getRecruitmentCostForLevel(level);
-                    Cost upgradingCostForLevel = unit.getUpgradingCostForLevel(level + 1);
+                    Cost upgradingCostForLevel = unit.getUpgradingCostForLevel(level);
                     ResourcesDto upgradingResources = ResourcesDto.builder()
                             .wood(upgradingCostForLevel.getWood())
                             .clay(upgradingCostForLevel.getClay())
@@ -259,26 +314,8 @@ public class UnitService implements IUnitService {
         Set<CityResources> cityResources = city.getCityResources();
         boolean prevLevelEnabled = isNotEmpty(availableLevels) && availableLevels.contains(level - 1);
         //TODO add checking buildings requirements
-        return areResourceRequirementsMet(cityResources, resourcesCost) &&
+        return resourceService.areResourceRequirementsMet(cityResources, resourcesCost) &&
                 ((level.equals(1) && !levelEnabled) || (!levelEnabled && prevLevelEnabled));
-    }
-
-    private boolean areResourceRequirementsMet(Set<CityResources> cityResources, ResourcesDto resourcesCost) {
-        return getAmountOf(wood, cityResources) >= resourcesCost.getWood()
-                && getAmountOf(clay, cityResources) >= resourcesCost.getClay()
-                && getAmountOf(iron, cityResources) >= resourcesCost.getIron();
-    }
-
-    private Integer getAmountOf(Resource resource, Set<CityResources> resources) {
-        if(isEmpty(resources) || resource == null) {
-            return 0;
-        }
-
-        return resources.stream()
-                .filter(r -> resource.equals(r.getResource()))
-                .findFirst()
-                .map(CityResources::getAmount)
-                .orElse(0);
     }
 
     private ResourcesDto mapCost(Cost cost) {
