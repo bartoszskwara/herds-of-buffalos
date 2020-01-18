@@ -8,4 +8,5 @@ import java.util.List;
 public interface IUserService {
     List<User> getAllUsers();
     UserDto findRandomUserWithMultipleCities();
+    UserDto findUserById(Long userId);
 }

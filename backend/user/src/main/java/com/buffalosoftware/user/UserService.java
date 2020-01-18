@@ -2,6 +2,7 @@ package com.buffalosoftware.user;
 
 import com.buffalosoftware.api.user.IUserService;
 import com.buffalosoftware.dto.building.UserDto;
+import com.buffalosoftware.entity.BaseEntity;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.repository.UserRepository;
@@ -36,18 +37,27 @@ public class UserService implements IUserService {
                         .filter(u -> u.getCities().size() > 1)
                         .findAny()
                         .orElseThrow(() -> new IllegalArgumentException("No users in database!")));
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .points(user.getCities().stream().mapToLong(City::getPoints).sum())
-                .ranking(findRankByPoints(user))
-                .numberOfCities(user.getCities().size())
-                .currentCityId(user.getCities().stream().findAny().map(c -> c.getId()).orElse(null))
-                .build();
+        return mapToDto(user);
+    }
+
+    @Override
+    public UserDto findUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
+        return mapToDto(user);
     }
 
     private Long findRankByPoints(User user) {
         return userRepository.findRankByPoints(user.getId());
     }
 
+    private UserDto mapToDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .points(user.getCities().stream().mapToLong(City::getPoints).sum())
+                .ranking(findRankByPoints(user))
+                .numberOfCities(user.getCities().size())
+                .currentCityId(user.getCities().stream().findAny().map(BaseEntity::getId).orElse(null))
+                .build();
+    }
 }
