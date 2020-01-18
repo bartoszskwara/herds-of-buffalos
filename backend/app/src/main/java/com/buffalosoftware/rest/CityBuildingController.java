@@ -3,11 +3,14 @@ package com.buffalosoftware.rest;
 import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.api.unit.IUnitService;
 import com.buffalosoftware.dto.building.BaseDtoList;
+import com.buffalosoftware.dto.building.BuildingUpgradeRequestDto;
 import com.buffalosoftware.entity.Building;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +34,14 @@ public class CityBuildingController {
     public ResponseEntity getUpgradePossibilities(@NotNull @PathVariable("userId") Long userId,
                                                   @NotNull @PathVariable("cityId") Long cityId) {
         return ResponseEntity.ok(new BaseDtoList<>(buildingService.getUpgradePossibilities(userId, cityId)));
+    }
+
+    @PostMapping("/upgrade")
+    public ResponseEntity upgradeBuilding(@NotNull @PathVariable("userId") Long userId,
+                                          @NotNull @PathVariable("cityId") Long cityId,
+                                          @NotNull @RequestBody BuildingUpgradeRequestDto buildingUpgradeRequestDto) {
+        buildingService.upgradeBuilding(userId, cityId, buildingUpgradeRequestDto);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{buildingKey}/unit")

@@ -1,8 +1,10 @@
 package com.buffalosoftware.building;
 
+import com.buffalosoftware.Cost;
 import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.dto.building.BuildingDto;
 import com.buffalosoftware.dto.building.BuildingNextLevelDto;
+import com.buffalosoftware.dto.building.BuildingUpgradeRequestDto;
 import com.buffalosoftware.dto.building.CityBuildingDto;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.entity.Building;
@@ -11,9 +13,12 @@ import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.CityResources;
 import com.buffalosoftware.entity.Resource;
 import com.buffalosoftware.entity.User;
+import com.buffalosoftware.repository.CityBuildingRepository;
 import com.buffalosoftware.repository.UserRepository;
+import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +39,8 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 public class BuildingService implements IBuildingService {
 
     private final UserRepository userRepository;
+    private final CityBuildingRepository cityBuildingRepository;
+    private final ResourceService resourceService;
 
     @Override
     public List<CityBuildingDto> getCityBuildings(Long userId, Long cityId) {
@@ -82,6 +89,58 @@ public class BuildingService implements IBuildingService {
         return Building.list().stream()
                 .map(building -> createBuildingNextLevelDto(building, city, cityBuildingsWithLevels.get(building)))
                 .collect(toList());
+    }
+
+    @Override
+    @Transactional
+    public void upgradeBuilding(Long userId, Long cityId, BuildingUpgradeRequestDto buildingUpgradeRequestDto) {
+        User user = userRepository.findUserWithCitiesAndBuildingsAndResourcesById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
+        City city = user.getCities().stream()
+                .filter(c -> c.getId().equals(cityId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("City doesn't exist"));
+        Building building = Building.getByKey(buildingUpgradeRequestDto.getBuilding())
+                .orElseThrow(() -> new IllegalArgumentException("Building doesn't exist!"));
+        CityBuilding cityBuilding = city.getCityBuildings().stream()
+                .filter(b -> building.equals(b.getBuilding()))
+                .findFirst()
+                .orElse(null);
+
+        ResourcesDto cost = mapCost(building.getUpgradingCostForLevel(buildingUpgradeRequestDto.getLevel()));
+        validateBuildingUpgradeConditions(city, building, buildingUpgradeRequestDto.getLevel(), cost);
+        if(cityBuilding == null) {
+            if(buildingUpgradeRequestDto.getLevel() == 1) {
+                CityBuilding newBuilding = new CityBuilding();
+                newBuilding.setCity(city);
+                newBuilding.setBuilding(building);
+                newBuilding.setLevel(buildingUpgradeRequestDto.getLevel());
+                cityBuildingRepository.save(newBuilding);
+            } else {
+                throw new IllegalArgumentException("Invalid level!");
+            }
+        } else {
+            cityBuilding.setLevel(buildingUpgradeRequestDto.getLevel());
+            cityBuildingRepository.save(cityBuilding);
+        }
+        resourceService.decreaseResources(city, cost);
+    }
+
+    private void validateBuildingUpgradeConditions(City city, Building building, Integer level, ResourcesDto cost) {
+        if(level > 1 && !isBuildingLevelEnabled(building, level - 1, city)) {
+            throw new IllegalArgumentException("Previous level not enabled!");
+        }
+        if(level > building.getMaxLevel()) {
+            throw new IllegalArgumentException("Level not available!");
+        }
+        if(!resourceService.areResourceRequirementsMet(city.getCityResources(), cost)) {
+            throw new IllegalArgumentException("Not enough resources!");
+        }
+    }
+
+    private boolean isBuildingLevelEnabled(Building building, Integer level, City city) {
+        return city.getCityBuildings().stream()
+                .anyMatch(b -> building.equals(b.getBuilding()) && level.equals(b.getLevel()));
     }
 
     private BuildingNextLevelDto createBuildingNextLevelDto(Building building, City city, Integer currentBuildingLevel) {
@@ -134,6 +193,17 @@ public class BuildingService implements IBuildingService {
                 .findFirst()
                 .map(CityResources::getAmount)
                 .orElse(0);
+    }
+
+    private ResourcesDto mapCost(Cost cost) {
+        if(cost == null) {
+            return null;
+        }
+        return ResourcesDto.builder()
+                .wood(cost.getWood())
+                .clay(cost.getClay())
+                .iron(cost.getIron())
+                .build();
     }
 
 }

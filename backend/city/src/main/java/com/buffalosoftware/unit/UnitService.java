@@ -7,8 +7,8 @@ import com.buffalosoftware.dto.unit.CityUnitDto;
 import com.buffalosoftware.dto.unit.RecruitmentDto;
 import com.buffalosoftware.dto.unit.UnitLevelDataDto;
 import com.buffalosoftware.dto.unit.UnitUpgradeDto;
+import com.buffalosoftware.dto.unit.UnitUpgradeRequestDto;
 import com.buffalosoftware.dto.unit.UnitWithLevelsDto;
-import com.buffalosoftware.dto.unit.UpgradeRequestDto;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
@@ -107,30 +107,30 @@ public class UnitService implements IUnitService {
 
     @Override
     @Transactional
-    public void upgradeUnit(Long userId, Long cityId, UpgradeRequestDto upgradeRequestDto) {
+    public void upgradeUnit(Long userId, Long cityId, UnitUpgradeRequestDto unitUpgradeRequestDto) {
         User user = userRepository.findUserWithCitiesById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User doesn't exist!"));
         City city = user.getCities().stream()
                 .filter(c -> c.getId().equals(cityId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("City doesn't exist!"));
-        Unit unit = Unit.getByKey(upgradeRequestDto.getUnit()).orElseThrow(() -> new IllegalArgumentException("Unit doesn't exist!"));
+        Unit unit = Unit.getByKey(unitUpgradeRequestDto.getUnit()).orElseThrow(() -> new IllegalArgumentException("Unit doesn't exist!"));
         CityBuilding cityBuilding = city.getCityBuildings().stream()
                 .filter(b -> unit.getBuilding().equals(b.getBuilding()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Building required for the unit doesn't exist in city!"));
 
         CityBuildingUnitLevel cityBuildingUnitLevel = cityBuilding.getUnitLevels().stream()
-                .filter(u -> unit.equals(u.getUnit()) && upgradeRequestDto.getLevel().equals(u.getAvailableLevel()))
+                .filter(u -> unit.equals(u.getUnit()) && unitUpgradeRequestDto.getLevel().equals(u.getAvailableLevel()))
                 .findFirst()
                 .orElse(null);
 
         if(cityBuildingUnitLevel == null) {
-            ResourcesDto cost = mapCost(unit.getUpgradingCostForLevel(upgradeRequestDto.getLevel()));
-            validateUnitUpgradeConditions(city, cityBuilding, unit, upgradeRequestDto.getLevel(), cost);
+            ResourcesDto cost = mapCost(unit.getUpgradingCostForLevel(unitUpgradeRequestDto.getLevel()));
+            validateUnitUpgradeConditions(city, cityBuilding, unit, unitUpgradeRequestDto.getLevel(), cost);
             CityBuildingUnitLevel newUnitLevel = new CityBuildingUnitLevel();
             newUnitLevel.setCityBuilding(cityBuilding);
-            newUnitLevel.setAvailableLevel(upgradeRequestDto.getLevel());
+            newUnitLevel.setAvailableLevel(unitUpgradeRequestDto.getLevel());
             newUnitLevel.setUnit(unit);
             cityBuildingUnitLevelRepository.save(newUnitLevel);
             resourceService.decreaseResources(city, cost);

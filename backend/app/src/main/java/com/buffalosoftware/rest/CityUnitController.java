@@ -3,7 +3,7 @@ package com.buffalosoftware.rest;
 import com.buffalosoftware.api.unit.IUnitService;
 import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.dto.unit.RecruitmentDto;
-import com.buffalosoftware.dto.unit.UpgradeRequestDto;
+import com.buffalosoftware.dto.unit.UnitUpgradeRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ public class CityUnitController {
     @PostMapping("/upgrade")
     public ResponseEntity upgradeUnit(@NotNull @PathVariable("userId") Long userId,
                                       @NotNull @PathVariable("cityId") Long cityId,
-                                      @Valid @RequestBody UpgradeRequestDto upgradeUnitDto) {
+                                      @Valid @RequestBody UnitUpgradeRequestDto upgradeUnitDto) {
         unitService.upgradeUnit(userId, cityId, upgradeUnitDto);
         return ResponseEntity.ok().build();
     }
