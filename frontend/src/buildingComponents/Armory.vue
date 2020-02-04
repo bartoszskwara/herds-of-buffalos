@@ -3,7 +3,7 @@
     <h1>Zbrojownia</h1>
     <div class="armory">
       <md-list class="md-double-line troop" :key="troop.unit.key" v-for="troop in troopUpgrades" :class="opacityClass(troop)">
-        <troop-armory :troop="troop"></troop-armory>
+        <troop-armory :troop="troop" :player="player"></troop-armory>
       </md-list>
     </div>
   </div>
@@ -11,6 +11,7 @@
 
 <script>
 import TroopArmory from "../components/TroopArmory.vue";
+import { EventBus } from '../event-bus.js';
 
 export default {
   components: {TroopArmory},
@@ -48,7 +49,20 @@ export default {
         )).catch((error) => {
           this.troopUpgrades = null;
           alert(error.response.data.message);
-        })
+        });
+
+      EventBus.$on('unit-upgrade', () => {
+        const axios = require('axios').default;
+            axios
+            .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/unit/upgrade")
+            .then(response => (
+              this.troopUpgrades = response.data.content
+            ))
+            .catch((error) => {
+            alert(error.response.data.message);
+          })
+
+      });
   }
 
 }

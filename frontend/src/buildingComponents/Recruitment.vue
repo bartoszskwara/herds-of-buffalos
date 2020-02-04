@@ -1,11 +1,11 @@
 <template>
   <div id="barracks">
     <div class="site">
-    <h1>Koszary</h1>
+    <h1>{{buildingLabel}}</h1>
     <recruitment-queue></recruitment-queue>
-    <div v-if="availableTroops !=null && isTroopAvailable == true">
-      <div :key="troop.unit.label" v-for="troop in availableTroops">
-        <md-list class="md-double-line troop">
+    <div v-if="availableTroops !=null && isAnyAvailableTroop()">
+      <div :key="troop.unit.building+troop.unit.label" v-for="troop in availableTroops">
+        <md-list class="md-double-line troop" v-if="troop.levelsData.length > 0">
           <troop-recruit :troop="troop" :resources="activeCity.resources" :player="player"></troop-recruit>
         </md-list>
       </div>
@@ -20,15 +20,19 @@
 <script>
 import TroopRecruit from "../components/TroopRecruit.vue";
 import RecruitmentQueue from "../components/RecruitmentQueue.vue";
+import { EventBus } from '../event-bus.js';
 
 export default {
   components: {TroopRecruit, RecruitmentQueue},
+  props: {
+    buildingId: String,
+    buildingLabel: String
+  },
   data() {
     return {
       alertMaxLevel: false,
       player: {},
       activeCity: {},
-      isTroopAvailable: true,
       availableTroops: [
                 {
                   unit: {
@@ -59,15 +63,13 @@ export default {
     }
   },
   methods: {
-    isAnyTroopAvailable(){
-      var len = this.availableTroops.length;
-      for(var i = 0 ; i < len ; i++){
-        if(this.availableTroops[i].levelsData[0].enabled == true){
-          return true;
-        }
+    isAnyAvailableTroop(){
+      var isAny = false;
+      for(var i = 0 ; i < this.availableTroops.length ; i++){
+        if(this.availableTroops[i].levelsData.length > 0) isAny = true;
       }
-      return false;
-    }
+      return isAny;
+    },
   },
   mounted: function(){
     const axios = require('axios').default;
@@ -82,14 +84,29 @@ export default {
           this.activeCity = response.data
         )),
         axios
-          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/barracks/unit")
+          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/"+this.buildingId+"/unit")
           .then(response => (
-            this.availableTroops = response.data.content
+            this.availableTroops = response.data.content,
+            this.buildingIdSaved = this.buildingId
           ))
         )).catch((error) => {
           this.availableTroops = null;
           alert(error.response.data.message);
-        })
+        });
+
+
+    EventBus.$on('unit-recruited', () => {
+      const axios = require('axios').default;
+      axios
+        .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/"+this.buildingId+"/unit")
+        .then(response => (
+          this.availableTroops = response.data.content
+        )).catch((error) => {
+        this.availableTroops = null;
+        alert(error.response.data.message);
+      });
+
+    });
   }
 
 }

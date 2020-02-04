@@ -87,8 +87,12 @@ export default {
 
 <style scoped>
 .md-table {
-  min-width: 800px !important;
+  width: 100%;
+  min-width: 600px !important;
+
 }
+
+
 .mat {
   width: 70px;
   text-align: center;

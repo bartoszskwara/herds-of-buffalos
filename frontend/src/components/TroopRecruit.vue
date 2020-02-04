@@ -1,5 +1,5 @@
 <template>
-  <div id="troop">
+  <div id="troopR">
     <md-toolbar :md-elevation="1">
       <span class="md-title">{{troop.unit.label}}</span>
     </md-toolbar>
@@ -45,7 +45,7 @@
           <md-field>
             <label>Rekrutacja</label>
             <md-input v-model="recruitCount[unitKind.level-1]" @keypress="isNumber($event)"></md-input>
-            <span class="md-helper-text">Max: {{getMaxRecruitCount(unitKind.recruitmentCost)}}</span>
+            <span class="md-helper-text">Max: {{unitKind.maxToRecruit}}</span>
           </md-field>
         </div>
 

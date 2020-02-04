@@ -2,10 +2,16 @@
   <div id="townhall">
 
       <h1>Ratusz</h1>
-      <div v-if="availableTroops !=null">
-        <md-list class="md-double-line troop" :key="troop.unit.key" v-for="troop in availableTroops">
-          <troop-recruit v-if="troop.levelsData[0].enabled == true" :troop="troop" :resources="activeCity.resources"></troop-recruit>
-        </md-list>
+
+      <div v-if="availableTroops !=null && isAnyAvailableTroop()">
+        <div :key="troop.unit.building+troop.unit.label" v-for="troop in availableTroops">
+          <md-list class="md-double-line troop" v-if="troop.levelsData.length > 0">
+            <troop-recruit :troop="troop" :resources="activeCity.resources" :player="player"></troop-recruit>
+          </md-list>
+        </div>
+      </div>
+      <div v-else>
+        <p class="info">Aby rekrutować jednostki w tym budynku, zbadaj je najpierw w zbrojowni!</p>
       </div>
       <building-list></building-list>
 
@@ -15,6 +21,7 @@
 <script>
 import BuildingList from "../components/BuildingList.vue";
 import TroopRecruit from "../components/TroopRecruit.vue";
+import { EventBus } from '../event-bus.js';
 
 export default {
   components: {BuildingList, TroopRecruit},
@@ -51,6 +58,15 @@ export default {
                         ],
     }
   },
+  methods: {
+    isAnyAvailableTroop(){
+      var isAny = false;
+      for(var i = 0 ; i < this.availableTroops.length ; i++){
+        if(this.availableTroops[i].levelsData.length > 0) isAny = true;
+      }
+      return isAny;
+    }
+  },
   mounted: function(){
     const axios = require('axios').default;
     axios
@@ -68,7 +84,22 @@ export default {
         )).catch((error) => {
           this.availableTroops = null;
           alert(error.response.data.message);
-        })
+        });
+
+
+    EventBus.$on('unit-recruited', () => {
+      const axios = require('axios').default;
+      axios
+        .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/townhall/unit")
+        .then(response => (
+          this.availableTroops = response.data.content
+        )).catch((error) => {
+        this.availableTroops = null;
+        alert(error.response.data.message);
+      });
+
+    });
+
   }
 }
 </script>
@@ -86,5 +117,8 @@ export default {
   margin-bottom: 20px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+}
+.info {
+  text-align: center;
 }
 </style>

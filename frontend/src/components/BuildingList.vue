@@ -7,7 +7,7 @@
         <div :key="building.building.key" v-for="building in buildingsArray">
         <md-list-item v-if="building.building.maxLevel != building.currentLevel">
           <div class="md-list-item-text" style="flex-grow:1">
-            <span><a class="buildingLabel" @click='setRoute(building.building.key)'>{{building.building.label}}</a></span>
+            <span><a class="buildingLabel" @click='setRoute(building.building.key, building.building.label)'>{{building.building.label}}</a></span>
             <span>Poziom {{building.currentLevel}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:1">
@@ -32,7 +32,7 @@
         </md-list-item>
         <md-list-item v-else>
           <div class="md-list-item-text" style="flex-grow:1">
-            <span><a class="buildingLabel" @click='setRoute(building.building.key)'>{{building.building.label}}</a></span>
+            <span><a class="buildingLabel" @click='setRoute(building.building.key, building.building.label)'>{{building.building.label}}</a></span>
             <span>Poziom {{building.currentLevel}}</span>
           </div>
           <div class="md-list-item-text" style="flex-grow:5">
@@ -59,7 +59,10 @@ export default {
       alertMaxLevel: false,
       alertText: "",
       buildingsArray: [{
-        building: Object,
+        building: {
+          key: String,
+          label: String
+        },
         nextLevel: Number,
         cost: {
           wood: Number,
@@ -96,8 +99,25 @@ export default {
         if(this.activeCity.resources.wood >= building.cost.wood
         && this.activeCity.resources.clay >= building.cost.clay
         && this.activeCity.resources.iron >= building.cost.iron){
-          building.currentLevel++;
-          building.nextLevel++;
+          const axios = require('axios').default;
+          axios.post('http://localhost:8088/user/'+this.player.id+'/city/'+this.player.currentCityId+'/building/upgrade', {
+                      "level": parseInt(building.nextLevel),
+                      "building": String(building.building.key)
+                  }).then(() => {
+                    axios
+                    .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/building/upgrade")
+                    .then(response => (
+                      this.buildingsArray = response.data.content
+                    )).catch((error) => {
+                      alert(error.response.data.message)
+                    })
+                  })
+                  .catch(function(error) {
+                    alert(error);
+                  });
+
+
+
         }
         else {
           this.alertText = "Brak zasobów na rozbudowę tego budynku!";
@@ -109,17 +129,22 @@ export default {
         this.alertMaxLevel = true;
       }
     },
-    setRoute(link){
-      this.$router.push(link);
+    setRoute(key, label){
+      if(key == "barracks" || key == "pasture" || key == "machineFactory" || key == "shipyard"){
+        this.$router.push({ name: 'recruitment', params: {buildingId: key, buildingLabel: label }})
+      }
+      else {
+        this.$router.push(key);
+      }
     }
   }
 
 }
 </script>
 
-<style>
+<style scoped>
   .md-list {
-    width: auto;
+    width: 100%;
     min-width: 320px;
     max-width: 100%;
     display: inline-block;

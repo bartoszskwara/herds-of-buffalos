@@ -2,7 +2,7 @@
   <div id="market">
     <div class="container">
     <md-list class="md-double-line">
-      <md-subheader>Profil{{userId}}</md-subheader>
+      <md-subheader>Profil</md-subheader>
 
       <md-list-item>
         <md-avatar>
@@ -28,7 +28,7 @@
 
       <md-list-item>
         <div class="table">
-          <md-table v-model="cities" md-sort="points" md-card md-sort-order="asc">
+          <md-table class="table" v-model="cities" md-sort="points" md-card md-sort-order="asc">
             <md-table-toolbar>
               <h1 class="md-title">Wioski</h1>
             </md-table-toolbar>
@@ -36,7 +36,7 @@
             <md-table-row slot="md-table-row" slot-scope="{ item }">
               <md-table-cell md-label="Nazwa wioski">{{ item.name }}</md-table-cell>
               <md-table-cell md-label="Punkty" md-sort-by="points">{{ item.points }}</md-table-cell>
-              <md-table-cell><md-button class="md-raised md-accent btn">Wyślij wojska</md-button></md-table-cell>
+              <md-table-cell class="btn_cell"><md-button class="md-raised md-accent">Wyślij wojska</md-button></md-table-cell>
             </md-table-row>
           </md-table>
         </div>
@@ -72,16 +72,16 @@ export default {
   },
   created: function(){
     const axios = require('axios').default;
-    // axios
-    //   .get('http://localhost:8088/user/'+this.userId)
-    //   .then(response => (
-    //     this.player = response.data,
+    axios
+      .get('http://localhost:8088/user/'+this.userId)
+      .then(response => (
+        this.player = response.data,
         axios
           .get('http://localhost:8088/user/'+this.userId+'/city')
           .then(response => (
             this.cities = response.data.content
           ))
-      // ))
+      ))
   },
 }
 </script>
@@ -102,9 +102,12 @@ export default {
   text-align: center !important;
 }
 .table {
-  width: 100%;
+  width: 100% !important;
 }
-.btn {
-  float: right;
+.btn_cell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
 }
 </style>

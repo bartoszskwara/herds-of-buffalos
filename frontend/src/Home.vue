@@ -7,10 +7,11 @@
       </div>
       <div class="rightPanel">
         <player-info :player="player" :activeCity="activeCity"></player-info>
-        <resources-panel :resources="activeCity.resources"></resources-panel>
+        <resources-panel :resources="activeCity.resources" :player="player" @updateResources="updateResources($event)"></resources-panel>
         <troops-panel :troops="troopsArray" :player="player" @updateTroops="updateTroops($event)"></troops-panel>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -19,6 +20,8 @@ import NavigationBar from "./menuComponents/NavigationBar.vue";
 import ResourcesPanel from "./menuComponents/ResourcesPanel.vue";
 import PlayerInfo from "./menuComponents/PlayerInfo.vue";
 import TroopsPanel from "./menuComponents/TroopsPanel.vue";
+
+import { EventBus } from './event-bus.js';
 
 export default {
   components: {NavigationBar, ResourcesPanel, PlayerInfo, TroopsPanel},
@@ -44,6 +47,9 @@ export default {
   updateTroops(list){
     this.troopsArray = list;
   },
+  updateResources(list){
+    this.activeCity.resources = list;
+  },
   mounted: function(){
     const axios = require('axios').default;
       axios
@@ -60,7 +66,23 @@ export default {
         ))
       )).catch((error) => {
         alert(error.response.data.message);
-      })
+      });
+
+    EventBus.$on('unit-recruited', () => {
+      const axios = require('axios').default;
+          axios
+          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/unit")
+          .then(response => {
+            this.troopsArray = response.data.content;
+            axios
+            .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId)
+            .then(response => {
+              this.activeCity = response.data;
+            })
+          }).catch((error) => {
+          alert(error.response.data.message);
+        })
+    });
   },
 }
 </script>
