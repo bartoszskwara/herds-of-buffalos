@@ -114,7 +114,7 @@ export default {
   }
   </script>
 
-  <style>
+  <style scoped>
   #map {
     margin: 0px 40px 0px 40px;
   }
@@ -217,6 +217,12 @@ export default {
     display: block;
   }
   .dialogButtons {
-    margin: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+  .dialogButtons .md-button {
+    margin-right: 10px !important;
   }
   </style>

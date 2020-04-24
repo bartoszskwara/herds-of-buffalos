@@ -3,7 +3,7 @@
     <md-list class="md-double-line">
       <md-subheader>Cel wyprawy</md-subheader>
 
-      <md-list-item class="md-inset">
+      <md-list-item>
         <md-avatar>
           <img src="https://placeimg.com/40/40/people/5" alt="People">
         </md-avatar>
@@ -12,8 +12,8 @@
           <span>Gracz</span>
         </div>
       </md-list-item>
-      <md-list-item class="md-inset">
-        <img :src="setVillageImage(village)" />
+      <md-list-item>
+        <img class="city" :src="setVillageImage(village)" />
         <div class="md-list-item-text">
           <span>{{village.name}} <span class="punkty">({{village.points}}p.)</span></span>
           <span>Nazwa wioski</span>
@@ -68,9 +68,8 @@ export default {
 .md-list-item-text img {
   width: 40px;
 }
-.md-icon.city {
-  width: 40px !important;
-  height: 110%;
+.city {
+  margin-right: 15px;
 }
 .punkty {
   font-size: 8pt;

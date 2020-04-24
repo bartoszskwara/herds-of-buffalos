@@ -2,11 +2,12 @@
   <div id="village">
       <h1>{{player.activeVillage}}</h1>
       <div class="villageView">
-        <router-link class="buildingImg" v-bind:style="setBuildingPosition(400,70)" to="townhall"><img src="../assets/townhall.png"/></router-link>
-        <router-link class="buildingImg" v-bind:style="setBuildingPosition(100,200)" to="armory"><img src="../assets/armory.jpg"/></router-link>
-        <router-link class="buildingImg" v-bind:style="setBuildingPosition(600,250)" to="barracks"><img src="../assets/barracks.png"/></router-link>
+        <img src="../assets/townhall.png" class="buildingImg" v-bind:style="setBuildingPosition(400,50)" @click="setRoute('townhall', 'Ratusz')" />
+        <img src="../assets/armory.jpg" class="buildingImg" v-bind:style="setBuildingPosition(100,200)" @click="setRoute('armory', 'Zbrojownia')" />
+        <img src="../assets/barracks.png" class="buildingImg" v-bind:style="setBuildingPosition(600,200)" @click="setRoute('barracks', 'Koszary')" />
+        <img src="../assets/pasture.png" class="buildingImg" v-bind:style="setBuildingPosition(400,300)" @click="setRoute('pasture', 'Pastwisko')" />
       </div>
-      <md-button :key="building.building.key" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key)' :disabled="building.level > 0 ? false : true">
+      <md-button :key="building.building.key" v-for="building in buildingsArray" class="md-dense md-raised md-primary" @click.native='setRoute(building.building.key, building.building.label)' :disabled="building.level > 0 ? false : true">
         {{building.building.label}}
       </md-button>
   </div>
@@ -33,8 +34,13 @@ export default {
       ))
   },
   methods: {
-    setRoute(link){
-      this.$router.push(link);
+    setRoute(key, label){
+      if(key == "barracks" || key == "pasture" || key == "machineFactory" || key == "shipyard"){
+        this.$router.push({ name: 'recruitment', params: {buildingId: key, buildingLabel: label }})
+      }
+      else {
+        this.$router.push(key);
+      }
     },
     setBuildingPosition(x, y){
       var positionStyle = {top: y+'px', left: x+'px'};
@@ -44,7 +50,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .villageView {
   width: 900px;
   min-width: 900px;
@@ -56,5 +62,9 @@ export default {
 .buildingImg {
   width: 200px;
   position: absolute;
+  cursor: pointer;
+}
+.md-button {
+  margin: 5px !important;
 }
 </style>

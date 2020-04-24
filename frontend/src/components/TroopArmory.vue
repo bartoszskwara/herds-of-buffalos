@@ -1,5 +1,5 @@
 <template>
-  <div id="troop">
+  <div id="troopA">
 
     <md-toolbar :md-elevation="1">
       <span class="md-title">{{troop.unit.label}}</span>
@@ -32,7 +32,7 @@
         </span>
       </div>
       <div class="md-list-item-text btn" style="flex-grow: 2" v-if="!troopKind.enabled">
-          <md-button class="md-raised md-primary" @click="rankup(troop.unit.label, troopKind.level)" :disabled="!troopKind.upgradeRequirementsMet">Zbadaj</md-button>
+          <md-button class="md-raised md-primary" @click="rankup(troop.unit.key, troop.unit.label, troopKind.level)" :disabled="!troopKind.upgradeRequirementsMet">Zbadaj</md-button>
       </div>
       <div class="md-list-item-text" style="flex-grow: 4" v-if="troopKind.enabled">
         <span>
@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { EventBus } from '../event-bus.js';
+
 export default {
   data() {
     return {
@@ -61,12 +63,22 @@ export default {
     }
   },
   props: {
-    troop: Object
+    troop: Object,
+    player: Object,
   },
   methods: {
-    rankup(label, lvl) {
+    rankup(key, label, lvl) {
+      const axios = require('axios').default;
+      axios.post('http://localhost:8088/user/'+this.player.id+'/city/'+this.player.currentCityId+'/unit/upgrade', {
+                  "level": parseInt(lvl),
+                  "unit": String(key)
+              }).then(() => {
+                EventBus.$emit('unit-upgrade')
+              }).catch(function(error) {
+                alert(error);
+              })
+
       this.snackbarText = "Rozpoczęto szkolenie jednostek typu "+label+" na poziomie "+lvl+".";
-      this.troop.level++;
       this.showSnackbar = true;
     }
   }

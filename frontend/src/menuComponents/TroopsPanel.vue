@@ -10,9 +10,9 @@
         </div>
       </md-list-item>
 
-      <md-list class="md-double-line md-dense" :key="troop.key" v-for="troop in troops">
+      <md-list class="md-double-line md-dense" :key="troop.unit.building+troop.unit.key" v-for="troop in troops">
         <md-subheader class="first">{{troop.unit.label}}</md-subheader>
-        <md-list-item :key="troopKind.level" v-for="troopKind in troop.levelsData">
+        <md-list-item :key="troop.unit.key+troopKind.level" v-for="troopKind in troop.levelsData">
 
           <div class="md-list-item-text unitSymbol" style="flex-grow: 1">
             <md-icon>face</md-icon>
@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import { EventBus } from '../event-bus.js';
 
 export default {
   data() {
@@ -78,21 +77,6 @@ export default {
       return this.allTroops/this.pastureCapacity*100;
     }
   },
-  mounted() {
-    EventBus.$on('unit-recruited', () => {
-      const axios = require('axios').default;
-          axios
-          .get("http://localhost:8088/user/"+this.player.id+"/city/"+this.player.currentCityId+"/unit")
-          .then(response => (
-            this.updatedTroops = response.data.content,
-            this.troops = this.updatedTroops
-          )).catch((error) => {
-          alert(error.response.data.message);
-        })
-
-        this.$emit("updateTroops", this.updatedTroops);
-    });
-  }
 }
 </script>
 

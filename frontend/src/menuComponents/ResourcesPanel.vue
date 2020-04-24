@@ -35,10 +35,14 @@ export default {
   data() {
     return {
       granaryCapacity: 150000,
+      updatedResources: {
+        resources: {}
+      }
     }
   },
   props: {
-    resources: Object
+    resources: Object,
+    player: Object
   },
   methods: {
     setGranaryStyle(){
@@ -59,7 +63,7 @@ export default {
   },
   progressCapacity: function() {
     return this.allResources/this.granaryCapacity*100;
-  }
+  },
 }
 }
 </script>

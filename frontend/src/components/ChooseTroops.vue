@@ -8,7 +8,7 @@
 
           <div class="md-list-item-text">
             <md-field>
-              <label>Ilość</label>
+              <label class="inputLabel">Ilość</label>
               <md-icon class="chevron" :md-src="require('../assets/chevron'+troopKind.level+'.svg')"></md-icon>
               <md-input v-model="troopKind.chosen" @keypress="isNumber($event)"></md-input>
 
@@ -84,5 +84,8 @@ export default {
 h1 {
   font-size: 10pt;
   text-align: left;
+}
+.inputLabel {
+  margin-left: 30px;
 }
 </style>
