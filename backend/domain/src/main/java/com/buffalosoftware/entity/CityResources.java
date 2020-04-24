@@ -1,7 +1,6 @@
 package com.buffalosoftware.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,31 +10,43 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
+@Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(schema = "public", name = "city_resource")
+@EqualsAndHashCode(callSuper = true)
 public class CityResources extends BaseEntity {
 
-    @Getter
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
-    @Getter
-    @Setter
     @Column(name = "resource")
     @Enumerated(EnumType.STRING)
     private Resource resource;
 
-    @Getter
-    @Setter
     @Column(name = "amount")
     private Integer amount;
 
-    @Getter
-    @Setter
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
+
+    public void decreaseAmount(int value) {
+        if(value == 0) {
+            return;
+        }
+
+        if(amount - value <= 0) {
+            amount = 0;
+        } else {
+            amount -= value;
+        }
+        updateDate = LocalDateTime.now(ZoneId.of("UTC"));
+    }
 }

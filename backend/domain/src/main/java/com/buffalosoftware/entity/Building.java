@@ -2,6 +2,7 @@ package com.buffalosoftware.entity;
 
 import com.buffalosoftware.Cost;
 import com.buffalosoftware.ICostEntity;
+import com.buffalosoftware.unit.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +18,7 @@ import static java.util.Arrays.asList;
 @Getter
 @AllArgsConstructor
 public enum Building implements ICostEntity {
-    townhall("Town Hall", 30, 1.2),
+    townHall("Town Hall", 30, 1.2),
     barracks("Barracks", 20, 1.1),
     armory("Armory", 10, 1.05),
     granary("Granary", 30, 1.2),
@@ -41,12 +42,13 @@ public enum Building implements ICostEntity {
     private static final List<Building> allAvailableBuildings;
     private static final Map<Building, Cost> buildingFirstLevelCost;
     private static final Map<String, Building> buildingsByKey;
+    private final static Map<Building, Long> firstLevelConstructionTimeMap;
 
     static {
         allAvailableBuildings = asList(values());
 
         buildingFirstLevelCost = new HashMap<>();
-        buildingFirstLevelCost.put(townhall, new Cost(500, 500, 500));
+        buildingFirstLevelCost.put(townHall, new Cost(500, 500, 500));
         buildingFirstLevelCost.put(barracks, new Cost(500, 600, 700));
         buildingFirstLevelCost.put(armory, new Cost(550, 400, 900));
         buildingFirstLevelCost.put(granary, new Cost(800, 800, 800));
@@ -64,6 +66,25 @@ public enum Building implements ICostEntity {
         buildingFirstLevelCost.put(shipyard, new Cost(10000, 10000, 10000));
 
         buildingsByKey = allAvailableBuildings.stream().collect(Collectors.toMap(Enum::name, Function.identity()));
+
+        long debugValue = 10;
+        firstLevelConstructionTimeMap = new HashMap<>();
+        firstLevelConstructionTimeMap.put(townHall, 130000 / debugValue);
+        firstLevelConstructionTimeMap.put(barracks, 160000 / debugValue);
+        firstLevelConstructionTimeMap.put(armory, 180000 / debugValue);
+        firstLevelConstructionTimeMap.put(granary, 240000 / debugValue);
+        firstLevelConstructionTimeMap.put(brickyard, 105000 / debugValue);
+        firstLevelConstructionTimeMap.put(sawmill, 100800 / debugValue);
+        firstLevelConstructionTimeMap.put(ironworks, 104000 / debugValue);
+        firstLevelConstructionTimeMap.put(pasture, 1200000 / debugValue);
+        firstLevelConstructionTimeMap.put(machineFactory, 340000 / debugValue);
+        firstLevelConstructionTimeMap.put(palace, 550000 / debugValue);
+        firstLevelConstructionTimeMap.put(wall, 200000 / debugValue);
+        firstLevelConstructionTimeMap.put(market, 200000 / debugValue);
+        firstLevelConstructionTimeMap.put(well, 700000 / debugValue);
+        firstLevelConstructionTimeMap.put(fountain, 700000 / debugValue);
+        firstLevelConstructionTimeMap.put(statue, 650000 / debugValue);
+        firstLevelConstructionTimeMap.put(shipyard, 800000 / debugValue);
     }
 
     public static List<Building> list() {
@@ -78,6 +99,10 @@ public enum Building implements ICostEntity {
         return new Cost(woodCost, clayCost, ironCost);
     }
 
+    public long getRecruitmentTimeForLevel(Integer level) {
+        return Math.round(getFirstLevelConstructionTimeMap(this) * (float) Math.pow(nextLevelCostFactor, level - 1));
+    }
+
     private static Cost getFirstLevelCost(Building building) {
         return buildingFirstLevelCost.get(building);
     }
@@ -85,4 +110,9 @@ public enum Building implements ICostEntity {
     public static Optional<Building> getByKey(String key) {
         return Optional.ofNullable(buildingsByKey.get(key));
     }
+
+    private static Long getFirstLevelConstructionTimeMap(Building building) {
+        return firstLevelConstructionTimeMap.get(building);
+    }
+
 }

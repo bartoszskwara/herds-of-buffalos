@@ -29,4 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 "where u.id = :userId",
             nativeQuery = true)
     Long findRankByPoints(@Param("userId") Long userId);
+
+    Optional<User> findByName(String name);
+    Optional<User> findByEmail(String email);
 }

@@ -1,4 +1,4 @@
-package com.buffalosoftware.dto.building;
+package com.buffalosoftware.dto.user;
 
 import com.buffalosoftware.dto.BaseDto;
 import lombok.Builder;

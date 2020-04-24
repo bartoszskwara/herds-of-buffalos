@@ -9,10 +9,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
-public class UnitUpgradeRequestDto extends BaseDto {
+public class UnitPromotionRequestDto extends BaseDto {
     @NotBlank
     private String unit;
-
-    @Min(0)
-    private Integer level;
 }

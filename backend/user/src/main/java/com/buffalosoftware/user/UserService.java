@@ -1,14 +1,19 @@
 package com.buffalosoftware.user;
 
+import com.buffalosoftware.api.city.ICityService;
 import com.buffalosoftware.api.user.IUserService;
-import com.buffalosoftware.dto.building.UserDto;
+import com.buffalosoftware.dto.user.CreateUserRequestDto;
+import com.buffalosoftware.dto.user.UserDto;
 import com.buffalosoftware.entity.BaseEntity;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.buffalosoftware.entity.Building.barracks;
@@ -18,6 +23,7 @@ import static com.buffalosoftware.entity.Building.barracks;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+    private final ICityService cityService;
 
     @Override
     public List<User> getAllUsers() {
@@ -32,6 +38,11 @@ public class UserService implements IUserService {
                 .filter(u -> u.getCities().stream()
                         .anyMatch(city -> city.getCityBuildings().stream()
                                 .anyMatch(cityBuilding -> barracks.equals(cityBuilding.getBuilding()))))
+                .filter(u -> u.getCities().stream()
+                        .map(City::getCityUnits)
+                        .flatMap(Collection::stream)
+                        .map(cu -> cu.getUnit().getBuilding())
+                        .distinct().count() > 1)
                 .findFirst()
                 .orElse(allUsers.stream()
                         .filter(u -> u.getCities().size() > 1)
@@ -46,6 +57,23 @@ public class UserService implements IUserService {
         return mapToDto(user);
     }
 
+    @Override
+    @Transactional
+    public void createUser(CreateUserRequestDto createUserRequestDto) {
+        userRepository.findByName(createUserRequestDto.getName())
+                .ifPresent(s -> { throw new IllegalArgumentException("Name already exists!"); });
+        userRepository.findByEmail(createUserRequestDto.getEmail())
+                .ifPresent(s -> { throw new IllegalArgumentException("Email already exists!"); });
+
+        User user = new User();
+        user.setName(createUserRequestDto.getName());
+        user.setEmail(createUserRequestDto.getEmail());
+        City city = cityService.createFreshCity(user);
+
+        //TODO
+        throw new IllegalArgumentException("Functionality not implemented!");
+    }
+
     private Long findRankByPoints(User user) {
         return userRepository.findRankByPoints(user.getId());
     }
@@ -57,7 +85,7 @@ public class UserService implements IUserService {
                 .points(user.getCities().stream().mapToLong(City::getPoints).sum())
                 .ranking(findRankByPoints(user))
                 .numberOfCities(user.getCities().size())
-                .currentCityId(user.getCities().stream().findAny().map(BaseEntity::getId).orElse(null))
+                .currentCityId(user.getCities().stream().max(Comparator.comparing(c -> c.getCityUnits().size())).map(BaseEntity::getId).orElse(null))
                 .build();
     }
 }

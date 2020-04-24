@@ -1,13 +1,14 @@
 package com.buffalosoftware.api.city;
 
-import com.buffalosoftware.dto.building.BuildingNextLevelDto;
-import com.buffalosoftware.dto.building.BuildingUpgradeRequestDto;
+import com.buffalosoftware.dto.ProgressTaskDto;
+import com.buffalosoftware.dto.building.ConstructionProgressDto;
 import com.buffalosoftware.dto.building.CityBuildingDto;
+import com.buffalosoftware.entity.Building;
 
 import java.util.List;
 
 public interface IBuildingService {
     List<CityBuildingDto> getCityBuildings(Long userId, Long cityId);
-    List<BuildingNextLevelDto> getUpgradePossibilities(Long userId, Long cityId);
-    void upgradeBuilding(Long userId, Long cityId, BuildingUpgradeRequestDto buildingUpgradeRequestDto);
+    List<ConstructionProgressDto> getAllConstructionsProgressInCity(Long userId, Long cityId);
+    List<ProgressTaskDto> getTasks(Long userId, Long cityId, Building building);
 }

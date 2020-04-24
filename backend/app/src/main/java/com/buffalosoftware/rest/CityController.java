@@ -2,8 +2,8 @@ package com.buffalosoftware.rest;
 
 import com.buffalosoftware.api.city.ICityService;
 import com.buffalosoftware.dto.building.BaseDtoList;
-import com.buffalosoftware.dto.building.UserDto;
 import com.buffalosoftware.dto.city.CityDto;
+import com.buffalosoftware.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

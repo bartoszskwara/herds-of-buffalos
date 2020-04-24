@@ -10,6 +10,7 @@ public class CityUnitDto extends BaseDto {
     private String key;
     private String label;
     private String building;
+    private String buildingLabel;
     private Integer amount;
     private Integer level;
 }

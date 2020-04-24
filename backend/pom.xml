@@ -82,7 +82,6 @@
                 <artifactId>city</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.buffalosoftware</groupId>
                 <artifactId>api</artifactId>

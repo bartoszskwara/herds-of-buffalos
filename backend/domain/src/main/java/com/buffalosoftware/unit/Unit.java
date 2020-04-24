@@ -17,7 +17,7 @@ import static com.buffalosoftware.entity.Building.machineFactory;
 import static com.buffalosoftware.entity.Building.palace;
 import static com.buffalosoftware.entity.Building.pasture;
 import static com.buffalosoftware.entity.Building.shipyard;
-import static com.buffalosoftware.entity.Building.townhall;
+import static com.buffalosoftware.entity.Building.townHall;
 import static com.buffalosoftware.unit.UnitType.cavalry;
 import static com.buffalosoftware.unit.UnitType.civilian;
 import static com.buffalosoftware.unit.UnitType.infantry;
@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.toMap;
 @AllArgsConstructor
 public enum Unit implements ICostEntity {
     //civilian
-    citizen("Citizen", civilian, townhall, 1, 1, 1.0, 1.0),
+    citizen("Citizen", civilian, townHall, 1, 1, 1.0, 1.0),
 
     //infantry
     spearman("Spearman",    infantry, barracks, 1, 3, 3.0, 3.0),
@@ -42,22 +42,23 @@ public enum Unit implements ICostEntity {
     axeman("Axeman",        infantry, barracks, 3, 3, 3.0, 3.0),
     archer("Archer",        infantry, barracks, 4, 3, 3.5, 3.5),
     spy("Spy",              infantry, barracks, 5, 1, 1.0, 1.0),
-    stormTrooper("Storm Trooper",   infantry, barracks, 6, 5, 3.2, 3.2),
-    greatBuffalo("Great Buffalo",   infantry, palace,   1, 1, 1.0, 1.0),
+    stormTrooper("Storm Trooper",   infantry, barracks, 6, 5, 3.2, 2.5),
 
-    //cavalry
+    //cavalry,
     lightBuffalo("Light Buffalo", cavalry, pasture, 1, 4, 2.2, 2.2),
     heavyBuffalo("Heavy Buffalo", cavalry, pasture, 2, 3, 3.1, 3.1),
 
     //vehicle
-    plasmaCanon("Plasma Canon", vehicle, machineFactory, 1, 2, 5.0, 5.0),
+    plasmaCannon("Plasma Cannon", vehicle, machineFactory, 1, 2, 5.0, 5.0),
     bomber("Bomber",            vehicle, machineFactory, 2, 3, 4.6, 4.6),
     destroyer("Destroyer",      vehicle, machineFactory, 3, 2, 3.5, 3.5),
 
     //navy
     merchantShip("Merchant Ship",   navy, shipyard, 1, 1, 1.0, 1.0),
     sailboat("Sailboat",            navy, shipyard, 2, 3, 6.0, 6.0),
-    warship("Warship",              navy, shipyard, 3, 3, 3.0, 3.0);
+    warship("Warship",              navy, shipyard, 3, 3, 3.0, 3.0),
+
+    greatBuffalo("Great Buffalo",   infantry, palace,   1, 1, 1.0, 1.0);
 
     private String name;
     private UnitType type;
@@ -69,6 +70,8 @@ public enum Unit implements ICostEntity {
 
     private final static Map<String, Unit> unitByName;
     private final static Map<Unit, Cost> firstLevelRecruitmentCostMap;
+    private final static Map<Unit, Long> firstLevelRecruitmentTimeMap;
+    private final static Map<Unit, Long> firstLevelPromotionTimeMap;
     private final static Map<Unit, Cost> firstLevelUpgradingCostMap;
     private final static Map<Unit, UnitSkills> firstLevelUnitSkillsMap;
     private final static Map<Unit, Building> buildingByUnitMap;
@@ -89,7 +92,7 @@ public enum Unit implements ICostEntity {
         firstLevelRecruitmentCostMap.put(greatBuffalo, new Cost(30000, 30000, 30000));
         firstLevelRecruitmentCostMap.put(lightBuffalo, new Cost(220, 220, 220));
         firstLevelRecruitmentCostMap.put(heavyBuffalo, new Cost(400, 330, 570));
-        firstLevelRecruitmentCostMap.put(plasmaCanon, new Cost(1000, 800, 2000));
+        firstLevelRecruitmentCostMap.put(plasmaCannon, new Cost(1000, 800, 2000));
         firstLevelRecruitmentCostMap.put(bomber, new Cost(1800, 1000, 3000));
         firstLevelRecruitmentCostMap.put(destroyer, new Cost(4600, 5300, 6700));
         firstLevelRecruitmentCostMap.put(merchantShip, new Cost(1200, 1100, 800));
@@ -107,7 +110,7 @@ public enum Unit implements ICostEntity {
         firstLevelUnitSkillsMap.put(greatBuffalo, new UnitSkills(150, 150, 150));
         firstLevelUnitSkillsMap.put(lightBuffalo, new UnitSkills(90, 50, 90));
         firstLevelUnitSkillsMap.put(heavyBuffalo, new UnitSkills(65, 80, 120));
-        firstLevelUnitSkillsMap.put(plasmaCanon, new UnitSkills(80, 80, 160));
+        firstLevelUnitSkillsMap.put(plasmaCannon, new UnitSkills(80, 80, 160));
         firstLevelUnitSkillsMap.put(bomber, new UnitSkills(100, 10, 120));
         firstLevelUnitSkillsMap.put(destroyer, new UnitSkills(200, 50, 170));
         firstLevelUnitSkillsMap.put(merchantShip, new UnitSkills(10, 10, 50));
@@ -125,12 +128,49 @@ public enum Unit implements ICostEntity {
         firstLevelUpgradingCostMap.put(greatBuffalo, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(lightBuffalo, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(heavyBuffalo, new Cost(1000, 1000, 1000));
-        firstLevelUpgradingCostMap.put(plasmaCanon, new Cost(1000, 1000, 1000));
+        firstLevelUpgradingCostMap.put(plasmaCannon, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(bomber, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(destroyer, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(merchantShip, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(sailboat, new Cost(1000, 1000, 1000));
         firstLevelUpgradingCostMap.put(warship, new Cost(1000, 1000, 1000));
+
+        long debugValue = 10;
+        firstLevelRecruitmentTimeMap = new HashMap<>();
+        firstLevelRecruitmentTimeMap.put(citizen, 180000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(spearman, 210000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(guardsman, 230000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(axeman, 280000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(archer, 300000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(spy, 600000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(stormTrooper, 400000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(greatBuffalo, 1200000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(lightBuffalo, 430000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(heavyBuffalo, 460000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(plasmaCannon, 500000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(bomber, 400000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(destroyer, 700000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(merchantShip, 700000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(sailboat, 550000 / debugValue);
+        firstLevelRecruitmentTimeMap.put(warship, 900000 / debugValue);
+
+        firstLevelPromotionTimeMap = new HashMap<>();
+        firstLevelPromotionTimeMap.put(citizen, 180000 / debugValue);
+        firstLevelPromotionTimeMap.put(spearman, 210000 / debugValue);
+        firstLevelPromotionTimeMap.put(guardsman, 230000 / debugValue);
+        firstLevelPromotionTimeMap.put(axeman, 280000 / debugValue);
+        firstLevelPromotionTimeMap.put(archer, 300000 / debugValue);
+        firstLevelPromotionTimeMap.put(spy, 600000 / debugValue);
+        firstLevelPromotionTimeMap.put(stormTrooper, 400000 / debugValue);
+        firstLevelPromotionTimeMap.put(greatBuffalo, 1200000 / debugValue);
+        firstLevelPromotionTimeMap.put(lightBuffalo, 430000 / debugValue);
+        firstLevelPromotionTimeMap.put(heavyBuffalo, 460000 / debugValue);
+        firstLevelPromotionTimeMap.put(plasmaCannon, 500000 / debugValue);
+        firstLevelPromotionTimeMap.put(bomber, 400000 / debugValue);
+        firstLevelPromotionTimeMap.put(destroyer, 700000 / debugValue);
+        firstLevelPromotionTimeMap.put(merchantShip, 700000 / debugValue);
+        firstLevelPromotionTimeMap.put(sailboat, 550000 / debugValue);
+        firstLevelPromotionTimeMap.put(warship, 900000 / debugValue);
 
         buildingByUnitMap = list().stream()
                 .collect(toMap(identity(), Unit::getBuilding));
@@ -156,10 +196,17 @@ public enum Unit implements ICostEntity {
     }
 
     public Cost getRecruitmentCostForLevel(Integer level) {
+        if(level == null) {
+            return null;
+        }
         Integer woodCost = Math.round(getFirstLevelRecruitmentCost(this).getWood() * (float) Math.pow(nextLevelCostFactor, level - 1));
         Integer clayCost = Math.round(getFirstLevelRecruitmentCost(this).getClay() * (float) Math.pow(nextLevelCostFactor, level - 1));
         Integer ironCost = Math.round(getFirstLevelRecruitmentCost(this).getIron() * (float) Math.pow(nextLevelCostFactor, level - 1));
         return new Cost(woodCost, clayCost, ironCost);
+    }
+
+    public long getRecruitmentTimeForLevel(Integer level) {
+        return Math.round(getFirstLevelRecruitmentTimeMap(this) * (float) Math.pow(nextLevelCostFactor, level - 1));
     }
 
     @Override
@@ -168,6 +215,10 @@ public enum Unit implements ICostEntity {
         Integer clayCost = Math.round(getFirstLevelUpgradingCost(this).getClay() * (float) Math.pow(nextLevelCostFactor, level - 1));
         Integer ironCost = Math.round(getFirstLevelUpgradingCost(this).getIron() * (float) Math.pow(nextLevelCostFactor, level - 1));
         return new Cost(woodCost, clayCost, ironCost);
+    }
+
+    public long getPromotionTimeForLevel(Integer level) {
+        return Math.round(getFirstLevelPromotionTimeMap(this) * (float) Math.pow(nextLevelCostFactor, level - 1));
     }
 
     public UnitSkills getSkillsForLevel(Integer level) {
@@ -185,5 +236,11 @@ public enum Unit implements ICostEntity {
     }
     private static UnitSkills getFirstLevelUnitSkills(Unit unit) {
         return firstLevelUnitSkillsMap.get(unit);
+    }
+    private static Long getFirstLevelRecruitmentTimeMap(Unit unit) {
+        return firstLevelRecruitmentTimeMap.get(unit);
+    }
+    private static Long getFirstLevelPromotionTimeMap(Unit unit) {
+        return firstLevelPromotionTimeMap.get(unit);
     }
 }

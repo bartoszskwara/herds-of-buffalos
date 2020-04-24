@@ -1,7 +1,7 @@
 package com.buffalosoftware.dto.city;
 
 import com.buffalosoftware.dto.BaseDto;
-import com.buffalosoftware.dto.building.UserDto;
+import com.buffalosoftware.dto.user.UserDto;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import lombok.Builder;
 import lombok.Getter;
