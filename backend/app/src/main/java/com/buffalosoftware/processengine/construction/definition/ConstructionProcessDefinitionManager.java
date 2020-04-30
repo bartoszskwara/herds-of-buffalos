@@ -15,7 +15,7 @@ public class ConstructionProcessDefinitionManager implements DefinitionManager {
 
     private final static String CONSTRUCTION_PROCESS_DEFINITION_KEY = "construction_process.bpmn";
     private final static String CONSTRUCTION_PROCESS_TIMER_ID = "CONSTRUCTION_PROCESS_TIMER";
-    private final static String CONSTRUCTION_PROCESS_TIMER_NAME = "Wait until bulding is built";
+    private final static String CONSTRUCTION_PROCESS_TIMER_NAME = "Wait until building is built";
     private final static String CONSTRUCTION_PROCESS_START_TASK_ID = "CONSTRUCTION_PROCESS_START_TASK";
     private final static String CONSTRUCTION_PROCESS_START_TASK_NAME = "Set status of construction to InProgress";
     private final static String CONSTRUCTION_PROCESS_COMPLETED_TASK_ID = "CONSTRUCTION_PROCESS_COMPLETED_TASK";

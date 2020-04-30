@@ -1,4 +1,4 @@
-package com.buffalosoftware.processengine.recruitment.instance;
+package com.buffalosoftware.processengine.instance;
 
 import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
 import com.buffalosoftware.api.processengine.IProcessInstanceProducer;
