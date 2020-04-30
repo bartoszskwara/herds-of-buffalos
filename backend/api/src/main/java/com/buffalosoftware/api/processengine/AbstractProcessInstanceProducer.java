@@ -1,21 +1,26 @@
 package com.buffalosoftware.api.processengine;
 
 import com.buffalosoftware.api.ITimeService;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 
 import java.util.Map;
 
-public abstract class IProcessInstanceProducer {
+@RequiredArgsConstructor
+public abstract class AbstractProcessInstanceProducer {
+
+    protected final RuntimeService runtimeService;
+    protected final ITimeService timeService;
 
     public String createProcessInstance(ProcessInstanceVariablesDto processInstanceVariablesDto) {
         Map<ProcessInstanceVariable, Object> variables = processInstanceVariablesDto.getVariables();
 
-        ProcessInstantiationBuilder processInstanceBuilder = getRuntimeService().createProcessInstanceByKey(getDefinitionManager().getDefinitionKey());
+        ProcessInstantiationBuilder processInstanceBuilder = runtimeService.createProcessInstanceByKey(getDefinitionManager().getDefinitionKey());
         variables.forEach((variable, value) -> {
             Object variableValue = variables.get(variable);
             if(variable.isTimeValue()) {
-                variableValue = getTimeService().toSecondsISOCamundaFormat((Long) value);
+                variableValue = timeService.toSecondsISOCamundaFormat((Long) value);
             }
             processInstanceBuilder.setVariable(variable.name(), variableValue);
         });
@@ -26,6 +31,4 @@ public abstract class IProcessInstanceProducer {
 
     public abstract ProcessType supportedProcessType();
     public abstract DefinitionManager getDefinitionManager();
-    public abstract RuntimeService getRuntimeService();
-    public abstract ITimeService getTimeService();
 }

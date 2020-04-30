@@ -1,7 +1,7 @@
 package com.buffalosoftware.processengine.instance;
 
 import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
-import com.buffalosoftware.api.processengine.IProcessInstanceProducer;
+import com.buffalosoftware.api.processengine.AbstractProcessInstanceProducer;
 import com.buffalosoftware.api.processengine.ProcessType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +19,16 @@ import static java.util.stream.Collectors.toMap;
 @RequiredArgsConstructor
 public class ProcessInstanceProducerProvider implements IProcessInstanceProducerProvider {
 
-    private static Map<ProcessType, IProcessInstanceProducer> processInstanceProducers = new HashMap<>();
+    private static Map<ProcessType, AbstractProcessInstanceProducer> processInstanceProducers = new HashMap<>();
 
     @Override
-    public IProcessInstanceProducer getProducer(ProcessType processType) {
+    public AbstractProcessInstanceProducer getProducer(ProcessType processType) {
         return ofNullable(processInstanceProducers.get(processType)).orElseThrow(() -> new IllegalArgumentException("Process type is not supported!"));
     }
 
     @Autowired
-    public void setProcessInstanceProducers(List<IProcessInstanceProducer> providers) {
-        processInstanceProducers = providers.stream().collect(toMap(IProcessInstanceProducer::supportedProcessType, Function.identity()));
+    public void setProcessInstanceProducers(List<AbstractProcessInstanceProducer> providers) {
+        processInstanceProducers = providers.stream().collect(toMap(AbstractProcessInstanceProducer::supportedProcessType, Function.identity()));
     }
 
 }
