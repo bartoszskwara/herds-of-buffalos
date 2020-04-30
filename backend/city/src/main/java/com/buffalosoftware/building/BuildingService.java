@@ -77,7 +77,7 @@ public class BuildingService implements IBuildingService {
             return null;
         }
         var upgradeCost = mapCost(building.getUpgradingCostForLevel(nextLevel));
-        var upgradeTime = building.getRecruitmentTimeForLevel(nextLevel);
+        var upgradeTime = building.getConstructionTimeForLevel(nextLevel);
         return BuildingNextLevelDto.builder()
                 .level(nextLevel)
                 .upgradeRequirementsMet(areUpgradeRequirementsMet(city, cityBuilding, nextLevel, upgradeCost))
@@ -188,7 +188,7 @@ public class BuildingService implements IBuildingService {
         if(construction.getBuilding() == null || construction.getLevel() == null) {
             return 0L;
         }
-        long constructionTime = construction.getBuilding().getRecruitmentTimeForLevel(construction.getLevel());
+        long constructionTime = construction.getBuilding().getConstructionTimeForLevel(construction.getLevel());
         long timeSpent = Optional.ofNullable(construction.getStartDate())
                 .map(startDate -> timeService.nowMillis() - timeService.toMillis(construction.getStartDate()))
                 .orElse(0L);

@@ -1,6 +1,6 @@
 package com.buffalosoftware.processengine.deployment;
 
-import com.buffalosoftware.processengine.DefinitionManager;
+import com.buffalosoftware.api.processengine.DefinitionManager;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;

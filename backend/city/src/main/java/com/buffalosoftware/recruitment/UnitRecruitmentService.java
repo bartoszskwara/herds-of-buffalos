@@ -15,11 +15,13 @@ import com.buffalosoftware.dto.unit.RecruitmentProgressDto;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
+import com.buffalosoftware.entity.CityUnit;
 import com.buffalosoftware.entity.Recruitment;
 import com.buffalosoftware.entity.TaskEntity;
 import com.buffalosoftware.entity.TaskStatus;
 import com.buffalosoftware.repository.CityBuildingRepository;
 import com.buffalosoftware.repository.CityRepository;
+import com.buffalosoftware.repository.RecruitmentRepository;
 import com.buffalosoftware.resource.ResourceService;
 import com.buffalosoftware.unit.Unit;
 import lombok.RequiredArgsConstructor;
@@ -44,10 +46,35 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
     private final ResourceService resourceService;
     private final CityRepository cityRepository;
     private final CityBuildingRepository cityBuildingRepository;
+    private final RecruitmentRepository recruitmentRepository;
     private final ITimeService timeService;
     private final IProcessInstanceProducerProvider processInstanceProducerProvider;
     private final IProcessInstanceVariableProvider variableProvider;
     private final RuntimeService runtimeService;
+
+    @Override
+    public void recruit(Long recruitmentId, Integer amount) {
+        var recruitmentTask = recruitmentRepository.findById(recruitmentId).orElseThrow(() -> new IllegalArgumentException("Recruitment not found!"));
+        var city = recruitmentTask.getCityBuilding().getCity();
+        Optional<CityUnit> cityUnitOptional = findCityUnit(city, recruitmentTask);
+        cityUnitOptional.ifPresent(cityUnit -> cityUnit.increaseAmount(amount));
+        if(cityUnitOptional.isEmpty()) {
+            CityUnit newCityUnit = CityUnit.builder()
+                    .unit(recruitmentTask.getUnit())
+                    .city(city)
+                    .amount(amount)
+                    .level(recruitmentTask.getLevel())
+                    .build();
+            city.getCityUnits().add(newCityUnit);
+        }
+        cityRepository.save(city);
+    }
+
+    private Optional<CityUnit> findCityUnit(City city, Recruitment recruitment) {
+        return city.getCityUnits().stream()
+                .filter(u -> recruitment.getUnit().equals(u.getUnit()) && recruitment.getLevel().equals(u.getLevel()))
+                .findFirst();
+    }
 
     @Override
     public void recruit(Long userId, Long cityId, RecruitmentDto recruitmentDto) {

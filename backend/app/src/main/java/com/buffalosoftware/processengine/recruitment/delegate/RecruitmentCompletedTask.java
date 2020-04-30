@@ -18,7 +18,7 @@ import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.RECR
 public class RecruitmentCompletedTask implements JavaDelegate {
 
     private final Logger LOGGER = LoggerFactory.getLogger(RecruitmentCompletedTask.class);
-    private final IRecruitmentStatusManager recruitmentManager;
+    private final IRecruitmentStatusManager recruitmentStatusManager;
     private final IUnitRecruitmentService unitRecruitmentService;
     private final IProcessInstanceVariableProvider variableProvider;
 
@@ -26,7 +26,7 @@ public class RecruitmentCompletedTask implements JavaDelegate {
     public void execute(DelegateExecution delegateExecution) throws Exception {
         var recruitmentId = variableProvider.getVariable(delegateExecution, RECRUITMENT_ID, Long.class);
         var cityBuildingId = variableProvider.getVariable(delegateExecution, CITY_BUILDING_ID, Long.class);
-        recruitmentManager.completeRecruitment(recruitmentId);
+        recruitmentStatusManager.completeRecruitment(recruitmentId);
         LOGGER.info("Recruitment task [{}] completed", recruitmentId);
 
         unitRecruitmentService.startNextRecruitmentTaskIfNotInProgress(cityBuildingId);

@@ -99,7 +99,7 @@ public enum Building implements ICostEntity {
         return new Cost(woodCost, clayCost, ironCost);
     }
 
-    public long getRecruitmentTimeForLevel(Integer level) {
+    public long getConstructionTimeForLevel(Integer level) {
         return Math.round(getFirstLevelConstructionTimeMap(this) * (float) Math.pow(nextLevelCostFactor, level - 1));
     }
 

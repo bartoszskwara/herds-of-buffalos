@@ -86,7 +86,7 @@ public class TaskManager {
             }
 
             if(constructionTask.isPresent()) {
-                long taskDuration  = constructionTask.get().getBuilding().getRecruitmentTimeForLevel(constructionTask.get().getLevel());
+                long taskDuration  = constructionTask.get().getBuilding().getConstructionTimeForLevel(constructionTask.get().getLevel());
                 long timeLeft = calculateTimeLeft(constructionTask.get(), taskDuration).intValue();
 
                 if(timeLeft <= 0) {

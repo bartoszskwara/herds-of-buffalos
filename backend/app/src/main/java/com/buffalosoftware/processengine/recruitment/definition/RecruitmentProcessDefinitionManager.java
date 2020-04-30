@@ -1,10 +1,7 @@
 package com.buffalosoftware.processengine.recruitment.definition;
 
-import com.buffalosoftware.processengine.DefinitionManager;
-import com.buffalosoftware.processengine.recruitment.delegate.RecruitmentCompletedTask;
-import com.buffalosoftware.processengine.recruitment.delegate.RecruitmentStartedTask;
+import com.buffalosoftware.api.processengine.DefinitionManager;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.springframework.stereotype.Service;
@@ -28,8 +25,6 @@ public class RecruitmentProcessDefinitionManager implements DefinitionManager {
     private final static String RECRUITMENT_PROCESS_RECRUIT_UNIT_TASK_NAME = "Increase numbner of units";
     private final static String RECRUITMENT_PROCESS_CONDITION_ID = "RECRUITMENT_PROCESS_CONDITION";
     private final static String RECRUITMENT_PROCESS_CONDITION_NAME = "Are there any units left to be recruited?";
-    public static final String START_EVENT_ID = "START_EVENT";
-    public static final String END_EVENT_ID = "END_EVENT";
 
     @Override
     public String getDefinitionKey() {
@@ -63,7 +58,6 @@ public class RecruitmentProcessDefinitionManager implements DefinitionManager {
                             .camundaClass("com.buffalosoftware.processengine.recruitment.delegate.RecruitmentCompletedTask")
                         .endEvent(END_EVENT_ID)
                             .name("End recruitment process")
-                            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, RecruitmentCompletedTask.class.getName())
                 .done();
     }
 }
