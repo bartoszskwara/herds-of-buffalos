@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface IUnitRecruitmentService {
     void recruit(Long recruitmentId, Integer amount);
-    void recruit(Long userId, Long cityId, RecruitmentDto recruitmentDto);
+    void createRecruitmentTaskAndStartProcess(Long userId, Long cityId, RecruitmentDto recruitmentDto);
     List<RecruitmentProgressDto> getCityRecruitmentProgress(Long userId, Long cityId);
     List<RecruitmentProgressDto> getRecruitmentProgressByBuilding(City city, Building building);
     void startNextRecruitmentTaskIfNotInProgress(Long cityBuildingId);

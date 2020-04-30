@@ -8,6 +8,8 @@ import com.buffalosoftware.entity.City;
 import java.util.List;
 
 public interface IUnitPromotionService {
-    void promoteUnit(Long userId, Long cityId, UnitPromotionRequestDto unitPromotionRequestDto);
+    void promoteUnit(Long promotionId);
+    void createPromotionTaskAndStartProcess(Long userId, Long cityId, UnitPromotionRequestDto unitPromotionRequestDto);
     List<PromotionProgressDto> getPromotionProgressByBuilding(City city, Building building);
+    void startNextPromotionTaskIfNotInProgress(Long cityBuildingId);
 }

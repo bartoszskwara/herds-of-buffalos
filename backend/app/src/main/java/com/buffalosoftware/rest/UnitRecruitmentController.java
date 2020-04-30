@@ -4,9 +4,6 @@ import com.buffalosoftware.api.unit.IUnitRecruitmentService;
 import com.buffalosoftware.dto.building.BaseDtoList;
 import com.buffalosoftware.dto.unit.RecruitmentDto;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +26,7 @@ public class UnitRecruitmentController {
     public ResponseEntity recruit(@NotNull @PathVariable("userId") Long userId,
                                   @NotNull @PathVariable("cityId") Long cityId,
                                   @Valid @RequestBody RecruitmentDto recruitmentDto) {
-        unitRecruitmentService.recruit(userId, cityId, recruitmentDto);
+        unitRecruitmentService.createRecruitmentTaskAndStartProcess(userId, cityId, recruitmentDto);
         return ResponseEntity.ok().build();
     }
 

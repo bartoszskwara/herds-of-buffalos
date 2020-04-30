@@ -1,6 +1,9 @@
 package com.buffalosoftware.unit;
 
 import com.buffalosoftware.api.ITimeService;
+import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
+import com.buffalosoftware.api.processengine.ProcessInstanceVariablesDto;
+import com.buffalosoftware.api.processengine.ProcessType;
 import com.buffalosoftware.api.unit.IUnitPromotionService;
 import com.buffalosoftware.common.CostMapper;
 import com.buffalosoftware.dto.ProgressTaskType;
@@ -12,9 +15,13 @@ import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.CityBuildingUnitLevel;
 import com.buffalosoftware.entity.Promotion;
+import com.buffalosoftware.entity.TaskEntity;
+import com.buffalosoftware.repository.CityBuildingRepository;
 import com.buffalosoftware.repository.CityRepository;
+import com.buffalosoftware.repository.PromotionRepository;
 import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -23,6 +30,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_BUILDING_ID;
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.PROMOTION_ID;
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_PROMOTION_TIME;
 import static com.buffalosoftware.entity.TaskStatus.Pending;
 
 @Service
@@ -31,10 +41,27 @@ public class UnitPromotionService implements IUnitPromotionService {
 
     private final ResourceService resourceService;
     private final CityRepository cityRepository;
+    private final CityBuildingRepository cityBuildingRepository;
+    private final PromotionRepository promotionRepository;
     private final ITimeService timeService;
+    private final IProcessInstanceProducerProvider processInstanceProducerProvider;
+    private final RuntimeService runtimeService;
 
     @Override
-    public void promoteUnit(Long userId, Long cityId, UnitPromotionRequestDto unitPromotionRequestDto) {
+    public void promoteUnit(Long promotionId) {
+        var promotionTask = promotionRepository.findById(promotionId).orElseThrow(() -> new IllegalArgumentException("Promotion not found!"));
+        var cityBuilding = promotionTask.getCityBuilding();
+        CityBuildingUnitLevel newUnitLevel = CityBuildingUnitLevel.builder()
+                .cityBuilding(cityBuilding)
+                .availableLevel(promotionTask.getLevel())
+                .unit(promotionTask.getUnit())
+                .build();
+        cityBuilding.getUnitLevels().add(newUnitLevel);
+        cityBuildingRepository.save(cityBuilding);
+    }
+
+    @Override
+    public void createPromotionTaskAndStartProcess(Long userId, Long cityId, UnitPromotionRequestDto unitPromotionRequestDto) {
         City city = findCityByIdAndUserId(userId, cityId);
         Unit unit = Unit.getByKey(unitPromotionRequestDto.getUnit()).orElseThrow(() -> new IllegalArgumentException("Unit doesn't exist!"));
         CityBuilding cityBuilding = findCityBuilding(city, unit.getBuilding());
@@ -53,6 +80,7 @@ public class UnitPromotionService implements IUnitPromotionService {
         cityBuilding.getPromotions().add(promotion);
         resourceService.decreaseResources(city, cost);
         cityRepository.save(city);
+        startNextPromotionTaskIfNotInProgress(cityBuilding);
     }
 
     @Override
@@ -62,6 +90,33 @@ public class UnitPromotionService implements IUnitPromotionService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Building does not exist in the city!"));
         return findAndMapNotCompletedPromotions(cityBuilding.getPromotions());
+    }
+
+    @Override
+    public void startNextPromotionTaskIfNotInProgress(Long cityBuildingId) {
+        var cityBuilding = cityBuildingRepository.findById(cityBuildingId).orElseThrow(() -> new IllegalArgumentException("City building not found!"));
+        startNextPromotionTaskIfNotInProgress(cityBuilding);
+    }
+
+    private void startNextPromotionTaskIfNotInProgress(CityBuilding cityBuilding) {
+        if(isPromotionInProgressInBuilding(cityBuilding)) {
+            return;
+        }
+        cityBuilding.getPromotions().stream()
+                .max(Comparator.comparing(TaskEntity::getCreationDate))
+                .ifPresent(promotion -> processInstanceProducerProvider.getProducer(ProcessType.promotion)
+                        .createProcessInstance(ProcessInstanceVariablesDto.builder()
+                                .variable(PROMOTION_ID, promotion.getId())
+                                .variable(UNIT_PROMOTION_TIME, promotion.getUnit().getPromotionTimeForLevel(promotion.getLevel()))
+                                .variable(CITY_BUILDING_ID, cityBuilding.getId())
+                                .build()));
+    }
+
+    private boolean isPromotionInProgressInBuilding(CityBuilding cityBuilding) {
+        return runtimeService.createExecutionQuery()
+                .variableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
+                .list()
+                .size() > 0;
     }
 
     private List<PromotionProgressDto> findAndMapNotCompletedPromotions(Set<Promotion> promotions) {

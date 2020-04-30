@@ -77,7 +77,7 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
     }
 
     @Override
-    public void recruit(Long userId, Long cityId, RecruitmentDto recruitmentDto) {
+    public void createRecruitmentTaskAndStartProcess(Long userId, Long cityId, RecruitmentDto recruitmentDto) {
         City city = findCityByIdAndUserId(userId, cityId);
         Unit unit = findUnit(recruitmentDto.getUnit());
         ResourcesDto cost = CostMapper.mapCost(unit.getRecruitmentCostForLevel(recruitmentDto.getLevel()));

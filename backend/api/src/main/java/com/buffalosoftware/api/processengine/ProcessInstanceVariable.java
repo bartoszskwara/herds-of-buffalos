@@ -12,7 +12,9 @@ public enum ProcessInstanceVariable {
    CITY_BUILDING_ID(false),
    BUILDING_CONSTRUCTION_TIME(true),
    CONSTRUCTION_ID(false),
-   CITY_ID(false);
+   CITY_ID(false),
+   PROMOTION_ID(false),
+   UNIT_PROMOTION_TIME(true);
 
    private boolean isTimeValue;
 }

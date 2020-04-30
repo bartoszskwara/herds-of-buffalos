@@ -24,7 +24,7 @@ public class UnitPromotionController {
     public ResponseEntity<Void> promoteUnit(@NotNull @PathVariable("userId") Long userId,
                                       @NotNull @PathVariable("cityId") Long cityId,
                                       @Valid @RequestBody UnitPromotionRequestDto promoteUnitDto) {
-        unitPromotionService.promoteUnit(userId, cityId, promoteUnitDto);
+        unitPromotionService.createPromotionTaskAndStartProcess(userId, cityId, promoteUnitDto);
         return ResponseEntity.ok().build();
     }
 }

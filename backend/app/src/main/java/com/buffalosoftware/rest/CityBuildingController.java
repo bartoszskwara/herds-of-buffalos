@@ -36,7 +36,7 @@ public class CityBuildingController {
     public ResponseEntity upgradeBuilding(@NotNull @PathVariable("userId") Long userId,
                                           @NotNull @PathVariable("cityId") Long cityId,
                                           @NotNull @RequestBody BuildingUpgradeRequestDto buildingUpgradeRequestDto) {
-        buildingUpgradeService.upgradeBuilding(userId, cityId, buildingUpgradeRequestDto);
+        buildingUpgradeService.createConstructionTaskAndStartProcess(userId, cityId, buildingUpgradeRequestDto);
         return ResponseEntity.ok().build();
     }
 

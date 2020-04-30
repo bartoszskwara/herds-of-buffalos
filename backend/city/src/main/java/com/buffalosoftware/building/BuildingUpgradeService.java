@@ -59,7 +59,7 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
     }
 
     @Override
-    public void upgradeBuilding(Long userId, Long cityId, BuildingUpgradeRequestDto buildingUpgradeRequestDto) {
+    public void createConstructionTaskAndStartProcess(Long userId, Long cityId, BuildingUpgradeRequestDto buildingUpgradeRequestDto) {
         var city = findCityByIdAndUserId(userId, cityId);
         var building = findBuilding(buildingUpgradeRequestDto.getBuilding());
         var cityBuilding = city.getCityBuildings().stream()

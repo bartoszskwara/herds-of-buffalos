@@ -10,10 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_BUILDING_ID;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_ID;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CONSTRUCTION_ID;
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.RECRUITMENT_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +27,10 @@ public class ConstructionCompletedTask implements JavaDelegate {
         var constructionId = variableProvider.getVariable(delegateExecution, CONSTRUCTION_ID, Long.class);
         var cityId = variableProvider.getVariable(delegateExecution, CITY_ID, Long.class);
         constructionStatusManager.completeConstruction(constructionId);
-        LOGGER.info("Construction task [{}] completed", constructionId);
 
         buildingUpgradeService.upgradeBuilding(constructionId);
+        LOGGER.info("Construction task [{}] completed", constructionId);
+
         buildingUpgradeService.startNextConstructionTaskIfNotInProgress(cityId);
     }
 }
