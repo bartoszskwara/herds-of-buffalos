@@ -122,10 +122,7 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
     }
 
     private boolean isRecruitmentInProgressInBuilding(CityBuilding cityBuilding) {
-        return runtimeService.createExecutionQuery()
-                .variableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
-                .list()
-                .size() > 0;
+        return cityBuilding.getRecruitments().stream().anyMatch(recruitment -> recruitment.getStatus().inProgress());
     }
 
     private City findCityByIdAndUserId(Long userId, Long cityId) {

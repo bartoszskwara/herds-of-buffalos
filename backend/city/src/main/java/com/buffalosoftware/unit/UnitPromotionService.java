@@ -113,10 +113,7 @@ public class UnitPromotionService implements IUnitPromotionService {
     }
 
     private boolean isPromotionInProgressInBuilding(CityBuilding cityBuilding) {
-        return runtimeService.createExecutionQuery()
-                .variableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
-                .list()
-                .size() > 0;
+        return cityBuilding.getPromotions().stream().anyMatch(promotion -> promotion.getStatus().inProgress());
     }
 
     private List<PromotionProgressDto> findAndMapNotCompletedPromotions(Set<Promotion> promotions) {

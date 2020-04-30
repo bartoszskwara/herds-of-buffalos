@@ -29,4 +29,8 @@ public enum TaskStatus {
     public boolean notCompleted() {
         return !Completed.equals(this);
     }
+
+    public boolean inProgress() {
+        return InProgress.equals(this);
+    }
 }

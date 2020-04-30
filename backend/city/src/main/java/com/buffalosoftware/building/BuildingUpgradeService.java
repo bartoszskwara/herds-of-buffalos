@@ -102,10 +102,7 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
     }
 
     private boolean isConstructionInProgressInBuilding(City city) {
-        return runtimeService.createExecutionQuery()
-                .variableValueEquals(CITY_ID.name(), city.getId())
-                .list()
-                .size() > 0;
+        return city.getConstructions().stream().anyMatch(construction -> construction.getStatus().inProgress());
     }
 
     private City findCityById(Long cityId) {
