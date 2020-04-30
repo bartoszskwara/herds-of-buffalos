@@ -2,6 +2,7 @@ package com.buffalosoftware.user;
 
 import com.buffalosoftware.api.city.ICityService;
 import com.buffalosoftware.api.user.IUserService;
+import com.buffalosoftware.dto.UserPointsDto;
 import com.buffalosoftware.dto.user.CreateUserRequestDto;
 import com.buffalosoftware.dto.user.UserDto;
 import com.buffalosoftware.entity.BaseEntity;
@@ -15,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import static com.buffalosoftware.entity.Building.barracks;
 
@@ -74,8 +78,14 @@ public class UserService implements IUserService {
         throw new IllegalArgumentException("Functionality not implemented!");
     }
 
-    private Long findRankByPoints(User user) {
-        return userRepository.findRankByPoints(user.getId());
+    private Integer findRankByPoints(User user) {
+        List<UserPointsDto> userPoints = userRepository.findUsersWithPoints().stream()
+                .sorted(Comparator.comparing(UserPointsDto::getPoints, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+        return IntStream.range(0, userPoints.size())
+                .filter(i -> user.getId().equals(userPoints.get(i).getUserId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist!"));
     }
 
     private UserDto mapToDto(User user) {

@@ -10,7 +10,7 @@ public class UserDto extends BaseDto {
     private Long id;
     private String name;
     private Long points;
-    private Long ranking;
+    private Integer ranking;
     private Integer numberOfCities;
     private Long currentCityId;
 }

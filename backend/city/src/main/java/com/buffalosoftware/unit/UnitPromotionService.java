@@ -1,19 +1,17 @@
 package com.buffalosoftware.unit;
 
-import com.buffalosoftware.api.TimeService;
+import com.buffalosoftware.api.ITimeService;
 import com.buffalosoftware.api.unit.IUnitPromotionService;
 import com.buffalosoftware.common.CostMapper;
 import com.buffalosoftware.dto.ProgressTaskType;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.dto.unit.PromotionProgressDto;
-import com.buffalosoftware.dto.unit.RecruitmentProgressDto;
 import com.buffalosoftware.dto.unit.UnitPromotionRequestDto;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.CityBuildingUnitLevel;
 import com.buffalosoftware.entity.Promotion;
-import com.buffalosoftware.entity.Recruitment;
 import com.buffalosoftware.repository.CityRepository;
 import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class UnitPromotionService implements IUnitPromotionService {
 
     private final ResourceService resourceService;
     private final CityRepository cityRepository;
-    private final TimeService timeService;
+    private final ITimeService timeService;
 
     @Override
     public void promoteUnit(Long userId, Long cityId, UnitPromotionRequestDto unitPromotionRequestDto) {

@@ -29,6 +29,11 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-engine</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,6 +1,6 @@
 package com.buffalosoftware.building;
 
-import com.buffalosoftware.api.TimeService;
+import com.buffalosoftware.api.ITimeService;
 import com.buffalosoftware.api.city.IBuildingService;
 import com.buffalosoftware.api.unit.IUnitPromotionService;
 import com.buffalosoftware.api.unit.IUnitRecruitmentService;
@@ -43,7 +43,7 @@ public class BuildingService implements IBuildingService {
     private final IUnitRecruitmentService unitRecruitmentService;
     private final IUnitPromotionService unitPromotionService;
     private final ResourceService resourceService;
-    private final TimeService timeService;
+    private final ITimeService timeService;
 
     @Override
     public List<CityBuildingDto> getCityBuildings(Long userId, Long cityId) {

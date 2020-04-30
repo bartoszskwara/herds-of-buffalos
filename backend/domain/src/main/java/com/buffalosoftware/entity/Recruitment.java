@@ -27,11 +27,10 @@ public class Recruitment extends TaskEntity {
 
     @Builder
     public Recruitment(TaskStatus status, LocalDateTime creationDate, LocalDateTime updateDate, LocalDateTime startDate,
-                       Unit unit, Integer level, Integer amountLeft, Integer amount, CityBuilding cityBuilding) {
+                       Unit unit, Integer level, Integer amount, CityBuilding cityBuilding) {
         super(status, creationDate, updateDate, startDate);
         this.unit = unit;
         this.level = level;
-        this.amountLeft = amountLeft;
         this.amount = amount;
         this.cityBuilding = cityBuilding;
     }
@@ -43,27 +42,10 @@ public class Recruitment extends TaskEntity {
     @Column(name = "level", nullable = false)
     private Integer level;
 
-    @Setter
-    @Column(name = "amountLeft", nullable = false)
-    private Integer amountLeft;
-
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "city_building_id", nullable = false)
     private CityBuilding cityBuilding;
-
-    public void decreaseAmount(int value) {
-        if(value == 0) {
-            return;
-        }
-
-        if(amountLeft - value <= 0) {
-            amountLeft = 0;
-        } else {
-            amountLeft -= value;
-        }
-        updateDate = LocalDateTime.now(ZoneId.of("UTC"));
-    }
 }

@@ -1,6 +1,6 @@
 package com.buffalosoftware.common;
 
-import com.buffalosoftware.api.TimeService;
+import com.buffalosoftware.api.ITimeService;
 import com.buffalosoftware.entity.*;
 import com.buffalosoftware.repository.CityRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +25,8 @@ import static org.apache.commons.lang3.math.NumberUtils.min;
 public class TaskManager {
 
     private final CityRepository cityRepository;
-    private final TimeService timeService;
-
+    private final ITimeService timeService;
+/*
     @Scheduled(fixedDelay = 5000) //TODO: Temporary solution, to be replaced with Camunda engine in the future
     @Transactional
     public void manageRecruitments() {
@@ -67,7 +67,7 @@ public class TaskManager {
             });
         });
         cityRepository.saveAll(cities);
-    }
+    }*/
 
     @Scheduled(fixedDelay = 5000) //TODO: Temporary solution, to be replaced with Camunda engine in the future
     @Transactional

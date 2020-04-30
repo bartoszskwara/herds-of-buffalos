@@ -1,6 +1,6 @@
 package com.buffalosoftware.generator;
 
-import com.buffalosoftware.api.TimeService;
+import com.buffalosoftware.api.ITimeService;
 import com.buffalosoftware.api.generator.IGeneratorService;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
@@ -48,7 +48,7 @@ public class GeneratorService implements IGeneratorService {
     private final CityUnitRepository cityUnitRepository;
     private final CityBuildingUnitLevelRepository cityBuildingUnitLevelRepository;
 
-    private final TimeService timeService;
+    private final ITimeService timeService;
 
     private static final List<String> users;
     private final static List<Building> buildingsWithoutTownHall = Building.list().stream()

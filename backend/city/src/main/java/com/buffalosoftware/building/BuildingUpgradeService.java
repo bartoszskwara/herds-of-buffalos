@@ -1,6 +1,6 @@
 package com.buffalosoftware.building;
 
-import com.buffalosoftware.api.TimeService;
+import com.buffalosoftware.api.ITimeService;
 import com.buffalosoftware.api.city.IBuildingUpgradeService;
 import com.buffalosoftware.common.CostMapper;
 import com.buffalosoftware.dto.building.BuildingUpgradeRequestDto;
@@ -21,7 +21,7 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
 
     private final CityRepository cityRepository;
     private final ResourceService resourceService;
-    private final TimeService timeService;
+    private final ITimeService timeService;
 
     @Override
     public void upgradeBuilding(Long userId, Long cityId, BuildingUpgradeRequestDto buildingUpgradeRequestDto) {

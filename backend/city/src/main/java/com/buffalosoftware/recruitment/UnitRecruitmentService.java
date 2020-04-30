@@ -1,6 +1,10 @@
 package com.buffalosoftware.recruitment;
 
-import com.buffalosoftware.api.TimeService;
+import com.buffalosoftware.api.ITimeService;
+import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
+import com.buffalosoftware.api.processengine.IProcessInstanceVariableProvider;
+import com.buffalosoftware.api.processengine.ProcessInstanceVariablesDto;
+import com.buffalosoftware.api.processengine.ProcessType;
 import com.buffalosoftware.api.unit.IUnitRecruitmentService;
 import com.buffalosoftware.common.CostMapper;
 import com.buffalosoftware.dto.ProgressTaskDto;
@@ -12,20 +16,25 @@ import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.Recruitment;
+import com.buffalosoftware.entity.TaskEntity;
 import com.buffalosoftware.entity.TaskStatus;
+import com.buffalosoftware.repository.CityBuildingRepository;
 import com.buffalosoftware.repository.CityRepository;
 import com.buffalosoftware.resource.ResourceService;
 import com.buffalosoftware.unit.Unit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.config.Task;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_BUILDING_ID;
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.RECRUITMENT_ID;
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_AMOUNT_LEFT;
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_RECRUITMENT_TIME;
+import static com.buffalosoftware.entity.TaskStatus.InProgress;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -34,7 +43,11 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
 
     private final ResourceService resourceService;
     private final CityRepository cityRepository;
-    private final TimeService timeService;
+    private final CityBuildingRepository cityBuildingRepository;
+    private final ITimeService timeService;
+    private final IProcessInstanceProducerProvider processInstanceProducerProvider;
+    private final IProcessInstanceVariableProvider variableProvider;
+    private final RuntimeService runtimeService;
 
     @Override
     public void recruit(Long userId, Long cityId, RecruitmentDto recruitmentDto) {
@@ -50,7 +63,6 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
                 .unit(unit)
                 .level(recruitmentDto.getLevel())
                 .amount(recruitmentDto.getAmount())
-                .amountLeft(recruitmentDto.getAmount())
                 .status(TaskStatus.Pending)
                 .creationDate(timeService.now())
                 .cityBuilding(cityBuilding)
@@ -58,6 +70,35 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
         cityBuilding.getRecruitments().add(recruitment);
         resourceService.decreaseResources(city, cost, recruitmentDto.getAmount());
         cityRepository.save(city);
+        startNextRecruitmentTaskIfNotInProgress(cityBuilding);
+    }
+
+    @Override
+    public void startNextRecruitmentTaskIfNotInProgress(Long cityBuildingId) {
+        var cityBuilding = cityBuildingRepository.findById(cityBuildingId).orElseThrow(() -> new IllegalArgumentException("City building not found!"));
+        startNextRecruitmentTaskIfNotInProgress(cityBuilding);
+    }
+
+    private void startNextRecruitmentTaskIfNotInProgress(CityBuilding cityBuilding) {
+        if(isRecruitmentInProgressInBuilding(cityBuilding)) {
+            return;
+        }
+        cityBuilding.getRecruitments().stream()
+                .max(Comparator.comparing(TaskEntity::getCreationDate))
+                .ifPresent(recruitment -> processInstanceProducerProvider.getProducer(ProcessType.recruitment)
+                        .createProcessInstance(ProcessInstanceVariablesDto.builder()
+                                .variable(RECRUITMENT_ID, recruitment.getId())
+                                .variable(UNIT_AMOUNT_LEFT, recruitment.getAmount())
+                                .variable(UNIT_RECRUITMENT_TIME, recruitment.getUnit().getRecruitmentTimeForLevel(recruitment.getLevel()))
+                                .variable(CITY_BUILDING_ID, cityBuilding.getId())
+                                .build()));
+    }
+
+    private boolean isRecruitmentInProgressInBuilding(CityBuilding cityBuilding) {
+        return runtimeService.createExecutionQuery()
+                .variableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
+                .list()
+                .size() > 0;
     }
 
     private City findCityByIdAndUserId(Long userId, Long cityId) {
@@ -126,12 +167,13 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
                     Long taskDuration = calculateTaskDuration(recruitment);
                     Long creationDate = timeService.toMillis(recruitment.getCreationDate());
                     Long startDate = timeService.toMillis(recruitment.getStartDate());
+                    Integer amountLeft = getAmountLeft(recruitment.getId());
                     return RecruitmentProgressDto.builder()
                             .id(recruitment.getId())
                             .unit(recruitment.getUnit())
                             .unitLevel(recruitment.getLevel())
                             .label(recruitment.getUnit().getName())
-                            .amount(recruitment.getAmountLeft())
+                            .amount(amountLeft)
                             .startDate(startDate)
                             .taskDuration(taskDuration)
                             .type(ProgressTaskType.recruitment)
@@ -141,6 +183,16 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    private Integer getAmountLeft(Long recruitmentId) {
+        Execution execution = runtimeService.createExecutionQuery()
+                .variableValueEquals(RECRUITMENT_ID.name(), recruitmentId)
+                .singleResult();
+        if(execution == null) {
+            return 0;
+        }
+        return variableProvider.getVariable(execution, UNIT_AMOUNT_LEFT, Integer.class);
     }
 
     private Long calculateTaskDuration(Recruitment recruitment) {
