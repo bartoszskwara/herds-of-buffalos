@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.BUILDING_CONSTRUCTION_TIME;
+import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_BUILDING_ID;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_ID;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CONSTRUCTION_ID;
 
@@ -92,7 +93,8 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
             return;
         }
         city.getConstructions().stream()
-                .max(Comparator.comparing(TaskEntity::getCreationDate))
+                .filter(recruitment -> recruitment.getStatus().pending())
+                .min(Comparator.comparing(TaskEntity::getCreationDate))
                 .ifPresent(construction -> processInstanceProducerProvider.getProducer(ProcessType.construction)
                         .createProcessInstance(ProcessInstanceVariablesDto.builder()
                                 .variable(CONSTRUCTION_ID, construction.getId())
@@ -102,6 +104,9 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
     }
 
     private boolean isConstructionInProgressInBuilding(City city) {
+        /*return runtimeService.createExecutionQuery().processVariableValueEquals(CITY_ID.name(), city.getId())
+                .list().stream()
+                .anyMatch(e -> !e.isEnded());*/
         return city.getConstructions().stream().anyMatch(construction -> construction.getStatus().inProgress());
     }
 

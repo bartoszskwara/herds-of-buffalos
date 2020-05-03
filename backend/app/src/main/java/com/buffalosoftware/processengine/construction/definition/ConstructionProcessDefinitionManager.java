@@ -1,7 +1,10 @@
 package com.buffalosoftware.processengine.construction.definition;
 
 import com.buffalosoftware.api.processengine.DefinitionManager;
+import com.buffalosoftware.processengine.construction.listener.ConstructionCompletedListener;
+import com.buffalosoftware.processengine.construction.listener.ConstructionStartedListener;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,6 @@ public class ConstructionProcessDefinitionManager implements DefinitionManager {
     private final static String CONSTRUCTION_PROCESS_DEFINITION_KEY = "construction_process.bpmn";
     private final static String CONSTRUCTION_PROCESS_TIMER_ID = "CONSTRUCTION_PROCESS_TIMER";
     private final static String CONSTRUCTION_PROCESS_TIMER_NAME = "Wait until building is built";
-    private final static String CONSTRUCTION_PROCESS_START_TASK_ID = "CONSTRUCTION_PROCESS_START_TASK";
-    private final static String CONSTRUCTION_PROCESS_START_TASK_NAME = "Set status of construction to InProgress";
-    private final static String CONSTRUCTION_PROCESS_COMPLETED_TASK_ID = "CONSTRUCTION_PROCESS_COMPLETED_TASK";
-    private final static String CONSTRUCTION_PROCESS_COMPLETED_TASK_NAME = "Set status of construction to Completed";
 
     @Override
     public String getDefinitionKey() {
@@ -32,16 +31,12 @@ public class ConstructionProcessDefinitionManager implements DefinitionManager {
                 .name(CONSTRUCTION_PROCESS_DEFINITION_KEY)
                 .startEvent(START_EVENT_ID)
                     .name(START_EVENT_NAME)
-                .serviceTask(CONSTRUCTION_PROCESS_START_TASK_ID)
-                    .name(CONSTRUCTION_PROCESS_START_TASK_NAME)
-                    .camundaClass("com.buffalosoftware.processengine.construction.delegate.ConstructionStartedTask")
+                    .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ConstructionStartedListener.class.getName())
                 .intermediateCatchEvent()
                     .id(CONSTRUCTION_PROCESS_TIMER_ID)
                     .name(CONSTRUCTION_PROCESS_TIMER_NAME)
                     .timerWithDuration(format("${%s}", BUILDING_CONSTRUCTION_TIME.name()))
-                .serviceTask(CONSTRUCTION_PROCESS_COMPLETED_TASK_ID)
-                    .name(CONSTRUCTION_PROCESS_COMPLETED_TASK_NAME)
-                    .camundaClass("com.buffalosoftware.processengine.construction.delegate.ConstructionCompletedTask")
+                    .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, ConstructionCompletedListener.class.getName())
                 .endEvent(END_EVENT_ID)
                     .name(END_EVENT_NAME)
                 .done();

@@ -37,6 +37,7 @@ import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.RECR
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_AMOUNT_LEFT;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_RECRUITMENT_TIME;
 import static com.buffalosoftware.entity.TaskStatus.InProgress;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -111,7 +112,8 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
             return;
         }
         cityBuilding.getRecruitments().stream()
-                .max(Comparator.comparing(TaskEntity::getCreationDate))
+                .filter(recruitment -> recruitment.getStatus().pending())
+                .min(Comparator.comparing(TaskEntity::getCreationDate))
                 .ifPresent(recruitment -> processInstanceProducerProvider.getProducer(ProcessType.recruitment)
                         .createProcessInstance(ProcessInstanceVariablesDto.builder()
                                 .variable(RECRUITMENT_ID, recruitment.getId())
@@ -122,6 +124,9 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
     }
 
     private boolean isRecruitmentInProgressInBuilding(CityBuilding cityBuilding) {
+        /*return runtimeService.createExecutionQuery().processVariableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
+                .list().stream()
+                .anyMatch(e -> !e.isEnded());*/
         return cityBuilding.getRecruitments().stream().anyMatch(recruitment -> recruitment.getStatus().inProgress());
     }
 
@@ -142,7 +147,7 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
     }
 
     private void validateRecruitmentLevel(Integer level, Integer maxLevel) {
-        Optional.ofNullable(level)
+        ofNullable(level)
                 .filter(l -> l >= 1 && l <= maxLevel)
                 .orElseThrow(() -> new IllegalArgumentException("Level not allowed!"));
     }
@@ -191,7 +196,7 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
                     Long taskDuration = calculateTaskDuration(recruitment);
                     Long creationDate = timeService.toMillis(recruitment.getCreationDate());
                     Long startDate = timeService.toMillis(recruitment.getStartDate());
-                    Integer amountLeft = getAmountLeft(recruitment.getId());
+                    Integer amountLeft = getAmountLeft(recruitment);
                     return RecruitmentProgressDto.builder()
                             .id(recruitment.getId())
                             .unit(recruitment.getUnit())
@@ -209,14 +214,16 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
                 .collect(Collectors.toList());
     }
 
-    private Integer getAmountLeft(Long recruitmentId) {
-        Execution execution = runtimeService.createExecutionQuery()
-                .variableValueEquals(RECRUITMENT_ID.name(), recruitmentId)
-                .singleResult();
-        if(execution == null) {
-            return 0;
+    private Integer getAmountLeft(Recruitment recruitment) {
+        if(recruitment.getStatus().pending()) {
+            return recruitment.getAmount();
         }
-        return variableProvider.getVariable(execution, UNIT_AMOUNT_LEFT, Integer.class);
+        Execution execution = runtimeService.createExecutionQuery()
+                .variableValueEquals(RECRUITMENT_ID.name(), recruitment.getId())
+                .singleResult();
+        return ofNullable(execution)
+                .map(e -> variableProvider.getVariable(e, UNIT_AMOUNT_LEFT, Integer.class))
+                .orElse(0);
     }
 
     private Long calculateTaskDuration(Recruitment recruitment) {
@@ -224,7 +231,7 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
             return 0L;
         }
         long recruitmentTime = recruitment.getUnit().getRecruitmentTimeForLevel(recruitment.getLevel()) * recruitment.getAmount();
-        long timeSpent = Optional.ofNullable(recruitment.getStartDate())
+        long timeSpent = ofNullable(recruitment.getStartDate())
                 .map(startDate -> timeService.nowMillis() - timeService.toMillis(recruitment.getStartDate()))
                 .orElse(0L);
         return Math.max(recruitmentTime - timeSpent, 0L);

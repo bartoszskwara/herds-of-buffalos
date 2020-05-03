@@ -2,13 +2,16 @@ package com.buffalosoftware.processengine.deployment;
 
 import com.buffalosoftware.api.processengine.DefinitionManager;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +24,16 @@ public class ProcessDeploymentManager {
     private Logger LOGGER = LoggerFactory.getLogger(ProcessDeploymentManager.class);
 
     private final RepositoryService repositoryService;
+    private final RuntimeService runtimeService;
+
+    @Value("${spring.jpa.hibernate.ddlAuto:}")
+    private String databaseInitState;
 
     @Autowired
     public void deployDefinitions(List<DefinitionManager> definitionManagers) {
+        if(StringUtils.containsIgnoreCase(databaseInitState, "create")) {
+            cleanUpDefinitions();
+        }
         definitionManagers.stream()
                 .filter(definitionManager -> !isProcessDeployed(definitionManager.getDefinitionKey()))
                 .forEach(definitionManager -> {
@@ -45,10 +55,8 @@ public class ProcessDeploymentManager {
         return isNotEmpty(repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).list());
     }
 
-    private void cleanUpDefinitions(String processDefinitionKey) {
-        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processDefinitionKey)
-                .list();
+    private void cleanUpDefinitions() {
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
         if (isNotEmpty(processDefinitions)) {
             processDefinitions.forEach(definition -> {
                 repositoryService.deleteProcessDefinition(definition.getId());

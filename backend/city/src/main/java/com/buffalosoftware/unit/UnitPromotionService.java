@@ -103,7 +103,8 @@ public class UnitPromotionService implements IUnitPromotionService {
             return;
         }
         cityBuilding.getPromotions().stream()
-                .max(Comparator.comparing(TaskEntity::getCreationDate))
+                .filter(recruitment -> recruitment.getStatus().pending())
+                .min(Comparator.comparing(TaskEntity::getCreationDate))
                 .ifPresent(promotion -> processInstanceProducerProvider.getProducer(ProcessType.promotion)
                         .createProcessInstance(ProcessInstanceVariablesDto.builder()
                                 .variable(PROMOTION_ID, promotion.getId())
@@ -113,6 +114,9 @@ public class UnitPromotionService implements IUnitPromotionService {
     }
 
     private boolean isPromotionInProgressInBuilding(CityBuilding cityBuilding) {
+        /*return runtimeService.createExecutionQuery().processVariableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
+                .list().stream()
+                .anyMatch(e -> !e.isEnded());*/
         return cityBuilding.getPromotions().stream().anyMatch(promotion -> promotion.getStatus().inProgress());
     }
 

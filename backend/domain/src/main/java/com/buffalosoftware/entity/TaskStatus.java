@@ -33,4 +33,8 @@ public enum TaskStatus {
     public boolean inProgress() {
         return InProgress.equals(this);
     }
+
+    public boolean pending() {
+        return Pending.equals(this);
+    }
 }

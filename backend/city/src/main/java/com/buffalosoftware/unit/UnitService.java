@@ -4,14 +4,19 @@ import com.buffalosoftware.api.unit.IUnitService;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.dto.unit.CityUnitDto;
 import com.buffalosoftware.dto.unit.UnitLevelDataDto;
+import com.buffalosoftware.dto.unit.UnitLevelStatus;
 import com.buffalosoftware.dto.unit.UnitWithLevelsDto;
 import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
+import com.buffalosoftware.entity.CityBuildingUnitLevel;
 import com.buffalosoftware.entity.CityResources;
 import com.buffalosoftware.entity.CityUnit;
+import com.buffalosoftware.entity.Promotion;
 import com.buffalosoftware.entity.Resource;
 import com.buffalosoftware.repository.CityRepository;
+import com.buffalosoftware.repository.PromotionRepository;
+import com.buffalosoftware.repository.RecruitmentRepository;
 import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -95,7 +101,7 @@ public class UnitService implements IUnitService {
                     return UnitLevelDataDto.builder()
                             .level(level)
                             .skills(unit.getSkillsForLevel(level))
-                            .enabled(isUnitLevelEnabled(cityBuilding, unit, level))
+                            .status(getUnitLevelStatus(cityBuilding, unit, level))
                             .recruitmentCost(recruitmentCost)
                             .amountInCity(getAmountInCity(unit, level, city))
                             .maxToRecruit(calculateMaxToRecruit(recruitmentCost, city.getCityResources()))
@@ -106,12 +112,21 @@ public class UnitService implements IUnitService {
                 .collect(toList());
     }
 
-    private boolean isUnitLevelEnabled(CityBuilding cityBuilding, Unit unit, Integer level) {
+    private UnitLevelStatus getUnitLevelStatus(CityBuilding cityBuilding, Unit unit, Integer level) {
         if(level < 1) {
             throw new IllegalArgumentException("Invalid level!");
         }
-        return cityBuilding.getUnitLevels().stream()
+        boolean isEnabled = cityBuilding.getUnitLevels().stream()
                 .anyMatch(u -> unit.equals(u.getUnit()) && level.equals(u.getAvailableLevel()));
+        if(isEnabled) {
+            return UnitLevelStatus.enabled;
+        }
+
+        boolean isInProgress = cityBuilding.getPromotions().stream()
+                .filter(p -> p.getStatus().notCompleted())
+                .anyMatch(p -> unit.equals(p.getUnit()) && level.equals(p.getLevel()));
+
+        return isInProgress ? UnitLevelStatus.inProgress : UnitLevelStatus.disabled;
     }
 
     private Integer getAmountInCity(Unit unit, Integer level, City city) {
@@ -136,8 +151,8 @@ public class UnitService implements IUnitService {
         if(level == 1) {
             return buildingsRequirementsMet && enoughResources;
         }
-        var isPreviousLevelEnabled = isUnitLevelEnabled(cityBuilding, unit, level - 1);
-        return isPreviousLevelEnabled && buildingsRequirementsMet && enoughResources;
+        var previousLevelStatus = getUnitLevelStatus(cityBuilding, unit, level - 1);
+        return UnitLevelStatus.enabled.equals(previousLevelStatus) && buildingsRequirementsMet && enoughResources;
     }
 
     private Integer calculateMaxToRecruit(ResourcesDto recruitmentCost, Set<CityResources> cityResources) {

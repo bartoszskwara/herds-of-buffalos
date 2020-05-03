@@ -1,7 +1,7 @@
 package com.buffalosoftware.processengine.instance;
 
-import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
 import com.buffalosoftware.api.processengine.AbstractProcessInstanceProducer;
+import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
 import com.buffalosoftware.api.processengine.ProcessType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
