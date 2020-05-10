@@ -14,5 +14,4 @@ public interface IUnitRecruitmentService {
     void createRecruitmentTaskAndStartProcess(Long userId, Long cityId, RecruitmentDto recruitmentDto);
     List<RecruitmentProgressDto> getCityRecruitmentProgress(Long userId, Long cityId);
     List<RecruitmentProgressDto> getRecruitmentProgressByBuilding(City city, Building building);
-    void startNextRecruitmentTaskIfNotInProgress(Long cityBuildingId);
 }

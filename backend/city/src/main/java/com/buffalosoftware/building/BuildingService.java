@@ -7,9 +7,9 @@ import com.buffalosoftware.api.unit.IUnitRecruitmentService;
 import com.buffalosoftware.dto.ProgressTaskDto;
 import com.buffalosoftware.dto.ProgressTaskType;
 import com.buffalosoftware.dto.building.BuildingDto;
-import com.buffalosoftware.dto.building.ConstructionProgressDto;
 import com.buffalosoftware.dto.building.CityBuildingDto;
 import com.buffalosoftware.dto.building.CityBuildingDto.BuildingNextLevelDto;
+import com.buffalosoftware.dto.building.ConstructionProgressDto;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.dto.unit.PromotionProgressDto;
 import com.buffalosoftware.dto.unit.RecruitmentProgressDto;
@@ -33,7 +33,8 @@ import java.util.stream.Collectors;
 import static com.buffalosoftware.common.CostMapper.mapCost;
 import static com.buffalosoftware.entity.Building.townHall;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +73,16 @@ public class BuildingService implements IBuildingService {
     }
 
     private BuildingNextLevelDto getNextLevel(City city, CityBuilding cityBuilding, Building building) {
-        var nextLevel = Optional.ofNullable(cityBuilding).map(c -> c.getLevel() + 1).orElse(1);
+        var currentLevelFromCity = Optional.ofNullable(cityBuilding)
+                .map(CityBuilding::getLevel)
+                .orElse(0);
+        var currentLevelFromConstruction = city.getConstructions().stream()
+                .filter(c -> building.equals(c.getBuilding()))
+                .filter(c -> c.getStatus().notCompleted())
+                .max(Comparator.comparing(Construction::getLevel))
+                .map(Construction::getLevel)
+                .orElse(0);
+        var nextLevel = Math.max(currentLevelFromCity, currentLevelFromConstruction) + 1;
         if(cityBuilding != null && cityBuilding.getBuilding().getMaxLevel().equals(cityBuilding.getLevel())) {
             return null;
         }
@@ -80,13 +90,13 @@ public class BuildingService implements IBuildingService {
         var upgradeTime = building.getConstructionTimeForLevel(nextLevel);
         return BuildingNextLevelDto.builder()
                 .level(nextLevel)
-                .upgradeRequirementsMet(areUpgradeRequirementsMet(city, cityBuilding, nextLevel, upgradeCost))
+                .upgradeRequirementsMet(areUpgradeRequirementsMet(city, cityBuilding, building, nextLevel, upgradeCost))
                 .upgradingCost(upgradeCost)
                 .upgradingTime(upgradeTime)
                 .build();
     }
 
-    private boolean areUpgradeRequirementsMet(City city, CityBuilding cityBuilding, Integer level, ResourcesDto upgradeCost) {
+    private boolean areUpgradeRequirementsMet(City city, CityBuilding cityBuilding, Building building, Integer level, ResourcesDto upgradeCost) {
         if(level < 1) {
             throw new IllegalArgumentException("Invalid level!");
         }
@@ -96,7 +106,12 @@ public class BuildingService implements IBuildingService {
             return buildingsRequirementsMet && enoughResources;
         }
         var isPreviousLevelEnabled = cityBuilding != null && cityBuilding.getLevel().equals(level - 1);
-        return isPreviousLevelEnabled && buildingsRequirementsMet && enoughResources;
+        var isPreviousLevelUnderConstruction = city.getConstructions().stream()
+                .filter(b -> building.equals(b.getBuilding()))
+                .filter(c -> c.getLevel().equals(level - 1))
+                .anyMatch(c -> c.getStatus().notCompleted());
+
+        return (isPreviousLevelEnabled || isPreviousLevelUnderConstruction) && buildingsRequirementsMet && enoughResources;
     }
 
     @Override
@@ -170,18 +185,14 @@ public class BuildingService implements IBuildingService {
     }
 
     private Integer findCurrentLevelOfConstruction(City city, Construction construction) {
-        Integer currentLevel;
         Optional<CityBuilding> building = city.getCityBuildings().stream()
                 .filter(b -> construction.getBuilding().equals(b.getBuilding()))
                 .findFirst();
         if(building.isPresent()) {
-            currentLevel = building.get().getLevel();
-        } else if(construction.getLevel() == 1) {
-            currentLevel = 0;
+            return building.get().getLevel();
         } else {
-            throw new IllegalArgumentException("Building does not exist in the city!");
+            return construction.getLevel() - 1;
         }
-        return currentLevel;
     }
 
     private Long calculateTaskDuration(Construction construction) {

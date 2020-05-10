@@ -16,7 +16,7 @@ import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT
 @RequiredArgsConstructor
 public class RecruitUnitTask implements JavaDelegate {
 
-    Logger LOGGER = LoggerFactory.getLogger(RecruitUnitTask.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(RecruitUnitTask.class);
     private final IProcessInstanceVariableProvider variableProvider;
     private final IUnitRecruitmentService unitRecruitmentService;
 

@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,9 @@ public enum Building implements ICostEntity {
     private static final Map<Building, Cost> buildingFirstLevelCost;
     private static final Map<String, Building> buildingsByKey;
     private final static Map<Building, Long> firstLevelConstructionTimeMap;
+    private final static Map<Building, Long> firstLevelResourceProductionTimeMap;
+    private static final Set<Building> productiveBuildings;
+    private static final Map<Building, Resource> productionResourceMap;
 
     static {
         allAvailableBuildings = asList(values());
@@ -85,6 +90,21 @@ public enum Building implements ICostEntity {
         firstLevelConstructionTimeMap.put(fountain, 700000 / debugValue);
         firstLevelConstructionTimeMap.put(statue, 650000 / debugValue);
         firstLevelConstructionTimeMap.put(shipyard, 800000 / debugValue);
+
+        firstLevelResourceProductionTimeMap = new HashMap<>();
+        firstLevelResourceProductionTimeMap.put(brickyard, 200000 / debugValue);
+        firstLevelResourceProductionTimeMap.put(sawmill, 250000 / debugValue);
+        firstLevelResourceProductionTimeMap.put(ironworks, 290000 / debugValue);
+
+        productiveBuildings = new HashSet<>();
+        productiveBuildings.add(brickyard);
+        productiveBuildings.add(sawmill);
+        productiveBuildings.add(ironworks);
+
+        productionResourceMap = new HashMap<>();
+        productionResourceMap.put(brickyard, Resource.clay);
+        productionResourceMap.put(sawmill, Resource.wood);
+        productionResourceMap.put(ironworks, Resource.iron);
     }
 
     public static List<Building> list() {
@@ -103,6 +123,22 @@ public enum Building implements ICostEntity {
         return Math.round(getFirstLevelConstructionTimeMap(this) * (float) Math.pow(nextLevelCostFactor, level - 1));
     }
 
+    public Long getResourceProductionTimeForLevel(Integer level) {
+        Long productionTime = getFirstLevelResourceProductionTimeMap(this);
+        if(productionTime == null) {
+            return null;
+        }
+        return Math.round(productionTime * Math.pow(nextLevelCostFactor, maxLevel - level));
+    }
+
+    public boolean canProduceResources() {
+        return productiveBuildings.contains(this);
+    }
+
+    public Resource getProductionResource() {
+        return productionResourceMap.get(this);
+    }
+
     private static Cost getFirstLevelCost(Building building) {
         return buildingFirstLevelCost.get(building);
     }
@@ -114,5 +150,7 @@ public enum Building implements ICostEntity {
     private static Long getFirstLevelConstructionTimeMap(Building building) {
         return firstLevelConstructionTimeMap.get(building);
     }
-
+    private static Long getFirstLevelResourceProductionTimeMap(Building building) {
+        return firstLevelResourceProductionTimeMap.get(building);
+    }
 }

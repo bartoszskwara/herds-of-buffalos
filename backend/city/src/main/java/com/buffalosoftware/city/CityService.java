@@ -13,7 +13,6 @@ import com.buffalosoftware.entity.Resource;
 import com.buffalosoftware.entity.User;
 import com.buffalosoftware.repository.CityRepository;
 import com.buffalosoftware.repository.UserRepository;
-import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,6 @@ public class CityService implements ICityService {
 
     private final UserRepository userRepository;
     private final CityRepository cityRepository;
-    private final ResourceService resourceService;
 
     @Override
     public List<City> getAllUserCities(Long userId) {
@@ -84,6 +82,12 @@ public class CityService implements ICityService {
         city.setCoordsX();
         city.setCoordsY();*/
         return null;
+    }
+
+    @Override
+    public City findCityById(Long cityId) {
+        return cityRepository.findById(cityId)
+                .orElseThrow(() -> new IllegalArgumentException("City not found!"));
     }
 
     private Integer getResourceAmount(Set<CityResources> cityResources, Resource resource) {

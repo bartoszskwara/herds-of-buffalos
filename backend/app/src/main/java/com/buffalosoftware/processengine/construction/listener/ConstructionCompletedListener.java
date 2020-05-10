@@ -1,6 +1,8 @@
 package com.buffalosoftware.processengine.construction.listener;
 
 import com.buffalosoftware.api.city.IBuildingUpgradeService;
+import com.buffalosoftware.api.event.ConstructionEvent;
+import com.buffalosoftware.api.event.IEventService;
 import com.buffalosoftware.api.processengine.IProcessInstanceVariableProvider;
 import com.buffalosoftware.api.unit.IConstructionStatusManager;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import static com.buffalosoftware.api.event.ConstructionEvent.ConstructionAction.completed;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_ID;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CONSTRUCTION_ID;
 
@@ -21,6 +24,7 @@ public class ConstructionCompletedListener implements JavaDelegate {
     private final IConstructionStatusManager constructionStatusManager;
     private final IBuildingUpgradeService buildingUpgradeService;
     private final IProcessInstanceVariableProvider variableProvider;
+    private final IEventService eventService;
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
@@ -31,6 +35,9 @@ public class ConstructionCompletedListener implements JavaDelegate {
         buildingUpgradeService.upgradeBuilding(constructionId);
         LOGGER.info("Construction task [{}] completed", constructionId);
 
-        buildingUpgradeService.startNextConstructionTaskIfNotInProgress(cityId);
+        eventService.sendEvent(ConstructionEvent.builder().source(this)
+                .cityId(cityId)
+                .action(completed)
+                .build());
     }
 }

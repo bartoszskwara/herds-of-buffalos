@@ -1,6 +1,8 @@
 package com.buffalosoftware.unit;
 
 import com.buffalosoftware.api.ITimeService;
+import com.buffalosoftware.api.event.IEventService;
+import com.buffalosoftware.api.event.PromotionEvent;
 import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
 import com.buffalosoftware.api.processengine.ProcessInstanceVariablesDto;
 import com.buffalosoftware.api.processengine.ProcessType;
@@ -44,8 +46,7 @@ public class UnitPromotionService implements IUnitPromotionService {
     private final CityBuildingRepository cityBuildingRepository;
     private final PromotionRepository promotionRepository;
     private final ITimeService timeService;
-    private final IProcessInstanceProducerProvider processInstanceProducerProvider;
-    private final RuntimeService runtimeService;
+    private final IEventService eventService;
 
     @Override
     public void promoteUnit(Long promotionId) {
@@ -80,7 +81,11 @@ public class UnitPromotionService implements IUnitPromotionService {
         cityBuilding.getPromotions().add(promotion);
         resourceService.decreaseResources(city, cost);
         cityRepository.save(city);
-        startNextPromotionTaskIfNotInProgress(cityBuilding);
+
+        eventService.sendEvent(PromotionEvent.builder().source(this)
+                .cityId(cityId)
+                .cityBuildingId(cityBuilding.getId())
+                .build());
     }
 
     @Override
@@ -90,34 +95,6 @@ public class UnitPromotionService implements IUnitPromotionService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Building does not exist in the city!"));
         return findAndMapNotCompletedPromotions(cityBuilding.getPromotions());
-    }
-
-    @Override
-    public void startNextPromotionTaskIfNotInProgress(Long cityBuildingId) {
-        var cityBuilding = cityBuildingRepository.findById(cityBuildingId).orElseThrow(() -> new IllegalArgumentException("City building not found!"));
-        startNextPromotionTaskIfNotInProgress(cityBuilding);
-    }
-
-    private void startNextPromotionTaskIfNotInProgress(CityBuilding cityBuilding) {
-        if(isPromotionInProgressInBuilding(cityBuilding)) {
-            return;
-        }
-        cityBuilding.getPromotions().stream()
-                .filter(recruitment -> recruitment.getStatus().pending())
-                .min(Comparator.comparing(TaskEntity::getCreationDate))
-                .ifPresent(promotion -> processInstanceProducerProvider.getProducer(ProcessType.promotion)
-                        .createProcessInstance(ProcessInstanceVariablesDto.builder()
-                                .variable(PROMOTION_ID, promotion.getId())
-                                .variable(UNIT_PROMOTION_TIME, promotion.getUnit().getPromotionTimeForLevel(promotion.getLevel()))
-                                .variable(CITY_BUILDING_ID, cityBuilding.getId())
-                                .build()));
-    }
-
-    private boolean isPromotionInProgressInBuilding(CityBuilding cityBuilding) {
-        /*return runtimeService.createExecutionQuery().processVariableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
-                .list().stream()
-                .anyMatch(e -> !e.isEnded());*/
-        return cityBuilding.getPromotions().stream().anyMatch(promotion -> promotion.getStatus().inProgress());
     }
 
     private List<PromotionProgressDto> findAndMapNotCompletedPromotions(Set<Promotion> promotions) {

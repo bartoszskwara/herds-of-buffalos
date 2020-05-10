@@ -1,18 +1,30 @@
 package com.buffalosoftware.resource;
 
+import com.buffalosoftware.api.ITimeService;
+import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
+import com.buffalosoftware.api.resource.IResourceService;
 import com.buffalosoftware.dto.resources.ResourcesDto;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityResources;
 import com.buffalosoftware.entity.Resource;
+import com.buffalosoftware.repository.CityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
-import static com.buffalosoftware.entity.Resource.*;
+import static com.buffalosoftware.entity.Resource.clay;
+import static com.buffalosoftware.entity.Resource.iron;
+import static com.buffalosoftware.entity.Resource.wood;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 @Service
-public class ResourceService {
+@RequiredArgsConstructor
+public class ResourceService implements IResourceService {
+    private final CityRepository cityRepository;
+    private final ITimeService timeService;
+    private final IProcessInstanceProducerProvider processInstanceProducerProvider;
 
     public void decreaseResources(City city, ResourcesDto resourcesDto) {
         decreaseResources(city, resourcesDto, 1);
@@ -45,5 +57,31 @@ public class ResourceService {
                 .findFirst()
                 .map(CityResources::getAmount)
                 .orElse(0);
+    }
+
+    @Override
+    public void increaseResources(Long cityId, Resource resource, Integer amount) {
+        if(amount == null) {
+            return;
+        }
+        City city = cityRepository.findById(cityId).orElseThrow(() -> new IllegalArgumentException("City not found!"));
+        Optional<CityResources> resourceInCity = city.getCityResources().stream()
+                .filter(res -> resource.equals(res.getResource()))
+                .findFirst();
+
+        CityResources cityResources;
+        if(resourceInCity.isPresent()) {
+            cityResources = resourceInCity.get();
+        } else {
+            cityResources = CityResources.builder()
+                    .city(city)
+                    .amount(0)
+                    .resource(resource)
+                    .updateDate(timeService.now())
+                    .build();
+            city.getCityResources().add(cityResources);
+        }
+        cityResources.increaseAmount(amount);
+        cityRepository.save(city);
     }
 }

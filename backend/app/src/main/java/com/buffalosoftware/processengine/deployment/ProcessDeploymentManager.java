@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class ProcessDeploymentManager {
     @Autowired
     public void deployDefinitions(List<DefinitionManager> definitionManagers) {
         if(StringUtils.containsIgnoreCase(databaseInitState, "create")) {
-            cleanUpDefinitions();
+            cleanUpInstancesAndDefinitions();
         }
         definitionManagers.stream()
                 .filter(definitionManager -> !isProcessDeployed(definitionManager.getDefinitionKey()))
@@ -55,10 +56,14 @@ public class ProcessDeploymentManager {
         return isNotEmpty(repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).list());
     }
 
-    private void cleanUpDefinitions() {
+    private void cleanUpInstancesAndDefinitions() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
         if (isNotEmpty(processDefinitions)) {
             processDefinitions.forEach(definition -> {
+                List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery()
+                        .processDefinitionId(definition.getId())
+                        .list();
+                instances.forEach(i -> runtimeService.deleteProcessInstance(i.getProcessInstanceId(), "Cleaning up", true));
                 repositoryService.deleteProcessDefinition(definition.getId());
                 repositoryService.deleteDeployment(definition.getDeploymentId());
             });

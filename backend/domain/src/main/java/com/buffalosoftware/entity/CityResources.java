@@ -49,4 +49,13 @@ public class CityResources extends BaseEntity {
         }
         updateDate = LocalDateTime.now(ZoneId.of("UTC"));
     }
+
+    public void increaseAmount(int value) {
+        if(value == 0) {
+            return;
+        }
+
+        amount += value;
+        updateDate = LocalDateTime.now(ZoneId.of("UTC"));
+    }
 }

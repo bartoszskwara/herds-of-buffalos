@@ -14,7 +14,10 @@ public enum ProcessInstanceVariable {
    CONSTRUCTION_ID(false),
    CITY_ID(false),
    PROMOTION_ID(false),
-   UNIT_PROMOTION_TIME(true);
+   UNIT_PROMOTION_TIME(true),
+   RESOURCE_PRODUCTION_TIME(true),
+   RESOURCE_PRODUCTION_AMOUNT(false),
+   RESOURCE_PRODUCTION_NAME(false);
 
    private boolean isTimeValue;
 }

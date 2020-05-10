@@ -11,5 +11,4 @@ public interface IUnitPromotionService {
     void promoteUnit(Long promotionId);
     void createPromotionTaskAndStartProcess(Long userId, Long cityId, UnitPromotionRequestDto unitPromotionRequestDto);
     List<PromotionProgressDto> getPromotionProgressByBuilding(City city, Building building);
-    void startNextPromotionTaskIfNotInProgress(Long cityBuildingId);
 }

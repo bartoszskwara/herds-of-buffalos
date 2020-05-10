@@ -2,9 +2,9 @@ package com.buffalosoftware.building;
 
 import com.buffalosoftware.api.ITimeService;
 import com.buffalosoftware.api.city.IBuildingUpgradeService;
-import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
-import com.buffalosoftware.api.processengine.ProcessInstanceVariablesDto;
-import com.buffalosoftware.api.processengine.ProcessType;
+import com.buffalosoftware.api.event.BuildingEvent;
+import com.buffalosoftware.api.event.ConstructionEvent;
+import com.buffalosoftware.api.event.IEventService;
 import com.buffalosoftware.common.CostMapper;
 import com.buffalosoftware.dto.building.BuildingUpgradeRequestDto;
 import com.buffalosoftware.dto.resources.ResourcesDto;
@@ -12,21 +12,15 @@ import com.buffalosoftware.entity.Building;
 import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.Construction;
-import com.buffalosoftware.entity.TaskEntity;
 import com.buffalosoftware.entity.TaskStatus;
 import com.buffalosoftware.repository.CityRepository;
 import com.buffalosoftware.repository.ConstructionRepository;
 import com.buffalosoftware.resource.ResourceService;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.BUILDING_CONSTRUCTION_TIME;
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_BUILDING_ID;
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_ID;
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CONSTRUCTION_ID;
+import static com.buffalosoftware.api.event.BuildingAction.upgraded;
+import static com.buffalosoftware.api.event.ConstructionEvent.ConstructionAction.created;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +30,7 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
     private final ResourceService resourceService;
     private final ConstructionRepository constructionRepository;
     private final ITimeService timeService;
-    private final IProcessInstanceProducerProvider processInstanceProducerProvider;
-    private final RuntimeService runtimeService;
+    private final IEventService eventService;
 
     @Override
     public void upgradeBuilding(Long constructionId) {
@@ -57,6 +50,11 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
                     city.getCityBuildings().add(newCityBuilding);
                 });
         cityRepository.save(city);
+        eventService.sendEvent(BuildingEvent.builder().source(this)
+                .building(constructionTask.getBuilding())
+                .cityId(city.getId())
+                .level(constructionTask.getLevel())
+                .action(upgraded).build());
     }
 
     @Override
@@ -79,39 +77,9 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
         city.getConstructions().add(construction);
         resourceService.decreaseResources(city, cost);
         cityRepository.save(city);
-        startNextConstructionTaskIfNotInProgress(city);
-    }
-
-    @Override
-    public void startNextConstructionTaskIfNotInProgress(Long cityId) {
-        var city = findCityById(cityId);
-        startNextConstructionTaskIfNotInProgress(city);
-    }
-
-    private void startNextConstructionTaskIfNotInProgress(City city) {
-        if(isConstructionInProgressInBuilding(city)) {
-            return;
-        }
-        city.getConstructions().stream()
-                .filter(recruitment -> recruitment.getStatus().pending())
-                .min(Comparator.comparing(TaskEntity::getCreationDate))
-                .ifPresent(construction -> processInstanceProducerProvider.getProducer(ProcessType.construction)
-                        .createProcessInstance(ProcessInstanceVariablesDto.builder()
-                                .variable(CONSTRUCTION_ID, construction.getId())
-                                .variable(BUILDING_CONSTRUCTION_TIME, construction.getBuilding().getConstructionTimeForLevel(construction.getLevel()))
-                                .variable(CITY_ID, city.getId())
-                                .build()));
-    }
-
-    private boolean isConstructionInProgressInBuilding(City city) {
-        /*return runtimeService.createExecutionQuery().processVariableValueEquals(CITY_ID.name(), city.getId())
-                .list().stream()
-                .anyMatch(e -> !e.isEnded());*/
-        return city.getConstructions().stream().anyMatch(construction -> construction.getStatus().inProgress());
-    }
-
-    private City findCityById(Long cityId) {
-        return cityRepository.findById(cityId).orElseThrow(() -> new IllegalArgumentException("City doesn't exist!"));
+        eventService.sendEvent(ConstructionEvent.builder().source(this)
+                .cityId(cityId)
+                .action(created).build());
     }
 
     private City findCityByIdAndUserId(Long userId, Long cityId) {
@@ -127,7 +95,10 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
         if(level == 1 && cityBuilding != null) {
             throw new IllegalArgumentException("Invalid level!");
         }
-        if(level > 1 && !cityBuilding.getLevel().equals(level - 1)) {
+        if(level > 1 && cityBuilding == null && !isUnderConstruction(city, building, level - 1)) {
+            throw new IllegalArgumentException("Invalid level!");
+        }
+        if(level > 1 && cityBuilding != null && !cityBuilding.getLevel().equals(level - 1) && !isUnderConstruction(city, building, level - 1)) {
             throw new IllegalArgumentException("Previous level not enabled!");
         }
         if(level > building.getMaxLevel()) {
@@ -136,5 +107,12 @@ public class BuildingUpgradeService implements IBuildingUpgradeService {
         if(!resourceService.doesCityHaveEnoughResources(city.getCityResources(), cost)) {
             throw new IllegalArgumentException("Not enough resources!");
         }
+    }
+
+    private boolean isUnderConstruction(City city, Building building, Integer level) {
+        return city.getConstructions().stream()
+                .filter(b -> building.equals(b.getBuilding()))
+                .filter(c -> c.getLevel().equals(level))
+                .anyMatch(c -> c.getStatus().notCompleted());
     }
 }

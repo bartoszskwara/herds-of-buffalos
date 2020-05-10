@@ -1,10 +1,9 @@
 package com.buffalosoftware.recruitment;
 
 import com.buffalosoftware.api.ITimeService;
-import com.buffalosoftware.api.processengine.IProcessInstanceProducerProvider;
+import com.buffalosoftware.api.event.IEventService;
+import com.buffalosoftware.api.event.RecruitmentEvent;
 import com.buffalosoftware.api.processengine.IProcessInstanceVariableProvider;
-import com.buffalosoftware.api.processengine.ProcessInstanceVariablesDto;
-import com.buffalosoftware.api.processengine.ProcessType;
 import com.buffalosoftware.api.unit.IUnitRecruitmentService;
 import com.buffalosoftware.common.CostMapper;
 import com.buffalosoftware.dto.ProgressTaskDto;
@@ -17,9 +16,7 @@ import com.buffalosoftware.entity.City;
 import com.buffalosoftware.entity.CityBuilding;
 import com.buffalosoftware.entity.CityUnit;
 import com.buffalosoftware.entity.Recruitment;
-import com.buffalosoftware.entity.TaskEntity;
 import com.buffalosoftware.entity.TaskStatus;
-import com.buffalosoftware.repository.CityBuildingRepository;
 import com.buffalosoftware.repository.CityRepository;
 import com.buffalosoftware.repository.RecruitmentRepository;
 import com.buffalosoftware.resource.ResourceService;
@@ -29,14 +26,15 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.CITY_BUILDING_ID;
+import static com.buffalosoftware.api.event.RecruitmentEvent.RecruitmentAction.created;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.RECRUITMENT_ID;
 import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_AMOUNT_LEFT;
-import static com.buffalosoftware.api.processengine.ProcessInstanceVariable.UNIT_RECRUITMENT_TIME;
-import static com.buffalosoftware.entity.TaskStatus.InProgress;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -46,12 +44,11 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
 
     private final ResourceService resourceService;
     private final CityRepository cityRepository;
-    private final CityBuildingRepository cityBuildingRepository;
     private final RecruitmentRepository recruitmentRepository;
     private final ITimeService timeService;
-    private final IProcessInstanceProducerProvider processInstanceProducerProvider;
     private final IProcessInstanceVariableProvider variableProvider;
     private final RuntimeService runtimeService;
+    private final IEventService eventService;
 
     @Override
     public void recruit(Long recruitmentId, Integer amount) {
@@ -98,36 +95,12 @@ public class UnitRecruitmentService implements IUnitRecruitmentService {
         cityBuilding.getRecruitments().add(recruitment);
         resourceService.decreaseResources(city, cost, recruitmentDto.getAmount());
         cityRepository.save(city);
-        startNextRecruitmentTaskIfNotInProgress(cityBuilding);
-    }
 
-    @Override
-    public void startNextRecruitmentTaskIfNotInProgress(Long cityBuildingId) {
-        var cityBuilding = cityBuildingRepository.findById(cityBuildingId).orElseThrow(() -> new IllegalArgumentException("City building not found!"));
-        startNextRecruitmentTaskIfNotInProgress(cityBuilding);
-    }
-
-    private void startNextRecruitmentTaskIfNotInProgress(CityBuilding cityBuilding) {
-        if(isRecruitmentInProgressInBuilding(cityBuilding)) {
-            return;
-        }
-        cityBuilding.getRecruitments().stream()
-                .filter(recruitment -> recruitment.getStatus().pending())
-                .min(Comparator.comparing(TaskEntity::getCreationDate))
-                .ifPresent(recruitment -> processInstanceProducerProvider.getProducer(ProcessType.recruitment)
-                        .createProcessInstance(ProcessInstanceVariablesDto.builder()
-                                .variable(RECRUITMENT_ID, recruitment.getId())
-                                .variable(UNIT_AMOUNT_LEFT, recruitment.getAmount())
-                                .variable(UNIT_RECRUITMENT_TIME, recruitment.getUnit().getRecruitmentTimeForLevel(recruitment.getLevel()))
-                                .variable(CITY_BUILDING_ID, cityBuilding.getId())
-                                .build()));
-    }
-
-    private boolean isRecruitmentInProgressInBuilding(CityBuilding cityBuilding) {
-        /*return runtimeService.createExecutionQuery().processVariableValueEquals(CITY_BUILDING_ID.name(), cityBuilding.getId())
-                .list().stream()
-                .anyMatch(e -> !e.isEnded());*/
-        return cityBuilding.getRecruitments().stream().anyMatch(recruitment -> recruitment.getStatus().inProgress());
+        eventService.sendEvent(RecruitmentEvent.builder().source(this)
+                .cityId(cityId)
+                .cityBuildingId(cityBuilding.getId())
+                .action(created)
+                .build());
     }
 
     private City findCityByIdAndUserId(Long userId, Long cityId) {
